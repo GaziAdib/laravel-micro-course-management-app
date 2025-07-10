@@ -67,10 +67,11 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name'.$id,
+            'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
         $category->update($validated);
+
         return redirect()->route('admin.categories.index')
         ->with('success', 'Category Updated Successfully');
     }
@@ -87,7 +88,7 @@ class CategoryController extends Controller
         ->with('success', 'Category Cannot be Deleted Because Courses Are associated with it!');
         }
 
-        $category->destroy();
+        $category->destroy($id);
 
         return redirect()->route('admin.categories.index')
         ->with('success', 'Category Deleted Successfully');
