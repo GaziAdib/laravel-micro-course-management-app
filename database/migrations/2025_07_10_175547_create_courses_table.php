@@ -26,8 +26,6 @@ return new class extends Migration
             $table->string('duration');
             $table->enum('level', ['beginner', 'intermediate', 'advanced']);
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->timestamps('published_at')->nullable();
-
             $table->timestamps();
         });
     }

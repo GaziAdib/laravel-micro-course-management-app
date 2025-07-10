@@ -2,10 +2,30 @@
 
 namespace App\Models;
 
+use App\CourseLevel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
 {
+    use HasFactory;
+
+    protected $fillable = [
+        'title',
+        'description',
+        'price',
+        'duration',
+        'is_paid',
+        'level',
+        'is_featured',
+        'category_id'
+    ];
+
+    protected $casts = [
+        'level' => CourseLevel::class
+    ];
+
+
     public function category()
     {
         return $this->belongsTo(Category::class);
