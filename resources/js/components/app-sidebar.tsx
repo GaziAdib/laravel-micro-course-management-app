@@ -4,8 +4,10 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, PenSquare, FolderPlus } from 'lucide-react';
 import AppLogo from './app-logo';
+
+import {usePage} from '@inertiajs/react'
 
 const mainNavItems: NavItem[] = [
     {
@@ -28,7 +30,33 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
+
 export function AppSidebar() {
+
+    const { auth } = usePage().props
+    const user = auth.user
+
+    const mainNavItems: NavItem[] = user?.role === 'admin' ? [
+    {
+        title: 'Categories',
+        href: '/admin/categories',
+        icon: FolderPlus,
+    },
+    {
+        title: 'Courses',
+        href: '/admin/courses',
+        icon: PenSquare,
+    },
+]: user?.role === 'user' ? [
+    {
+        title: 'Courses',
+        href: '/courses',
+        icon: BookOpen,
+    },
+]: [];
+
+
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
