@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ModuleService;
 use App\Models\Course;
-
+use App\Models\Module;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -20,7 +20,7 @@ class ModuleController extends Controller
     public function index()
     {
         $modules = $this->moduleService->paginateModules(10);
-        return Inertia::render('admin/modules', ['modules' => $modules]);
+        return Inertia::render('admin.modules', ['modules' => $modules]);
     }
 
     /**
@@ -66,7 +66,7 @@ class ModuleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id, Course $course)
+    public function update(Request $request, Module $module, Course $course)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255|unique:modules',
@@ -78,7 +78,7 @@ class ModuleController extends Controller
         ]);
 
 
-        $updated_module = $this->moduleService->updateModule($course->id, $id, $validated);
+        $updated_module = $this->moduleService->updateModule($course->id, $module->id, $validated);
 
         return redirect()->route('admin.modules.index')
             ->with('success', 'Module Updated Successfully')
@@ -88,17 +88,17 @@ class ModuleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Course $course, int $id)
+    public function destroy(Course $course, Module $module)
     {
 
-        $module = $this->moduleService->findModule($id, $course->id);
+        $module = $this->moduleService->findModule($module->id, $course->id);
 
         if ($module->lessons()->count() > 0) {
             return redirect()->route('admin.modules.index')
         ->with('success', 'Module Cannot be Deleted Because Lessons Are associated with it!');
         }
 
-        $this->moduleService->deleteModule($course->id, $id);
+        $this->moduleService->deleteModule($course->id, $module->id);
 
         return redirect()->route('admin.modules.index')
         ->with('success', 'Module Deleted Successfully');
