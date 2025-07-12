@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ModuleController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -16,9 +17,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
+
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('courses', CourseController::class)->except(['show']);
+    Route::resource('modules/{courseId}', ModuleController::class)->except(['show']);
 });
 
 
