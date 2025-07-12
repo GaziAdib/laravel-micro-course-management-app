@@ -1,25 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Category;
-use App\Models\Course;
+use App\Services\CourseService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CourseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected CourseService $courseService;
+
+    public function __construct(CourseService $courseService)
+    {
+        $this->courseService = $courseService;
+    }
+
+
     public function index()
     {
-        $courses = Course::with(['category', 'reviews.user'])
-                        ->withCount('reviews')
-                        ->latest()
-                        ->paginate(10);
-
-        $categories = Category::all();
+        $courses = $this->courseService->paginateCourses(10);
+        $categories = $this->courseService->getAllCategories();
         return Inertia::render('admin/courses', ['courses' => $courses, 'categories' => $categories]);
     }
 
@@ -57,15 +56,21 @@ class CourseController extends Controller
 
         ]);
 
-        Course::create($validated);
+        // Course::create($validated);
+
+        $course = $this->courseService->createCourse($validated);
+
 
         return redirect()->route('admin.courses.index')
-        ->with('success', 'New Course Added Successfully');
+            ->with('success', 'New Course Added Successfully')
+            ->with('data', $course);
+
+        // return redirect()->route('admin.courses.index')
+        // ->with('success', 'New Course Added Successfully');
+
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // this one is for detail page of course
     public function show(string $id)
     {
         //
@@ -82,11 +87,8 @@ class CourseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
-
-        $course = Course::findOrFail($id);
-
 
         $validated = $request->validate([
             'title' => 'required|string|max:255|unique:courses',
@@ -109,23 +111,25 @@ class CourseController extends Controller
 
         ]);
 
-
-        $course->update($validated);
+        // $course->update($validated);
+        $this->courseService->updateCourse($id, $validated);
 
         return redirect()->route('admin.courses.index')
-        ->with('success', 'Course Updated Successfully');
+            ->with('success', 'Course Updated Successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
-        $course = Course::findOrFail($id);
+        // $course = Course::findOrFail($id);
 
-        $course->destroy($id);
+        // $course->destroy($id);
+
+        $this->courseService->deleteCourse($id);
 
         return redirect()->route('admin.courses.index')
-        ->with('success', 'Course Deleted Successfully');
+            ->with('success', 'Course Deleted Successfully');
     }
 }

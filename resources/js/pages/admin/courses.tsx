@@ -191,16 +191,18 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
                             <TableRow>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Price</TableHead>
+                                <TableHead>Difficulty</TableHead>
                                 <TableHead>Category Name</TableHead>
                                 <TableHead>Reviews Count</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {courses.data.map((course) => (
+                            {courses?.data?.map((course) => (
                                 <TableRow key={course.id}>
                                     <TableCell>{course.title}</TableCell>
                                     <TableCell>{course.price}</TableCell>
+                                     <TableCell>{course.level}</TableCell>
                                     <TableCell>{course.category.name}</TableCell>
                                     <TableCell>{course?.reviews_count}</TableCell>
                                     <TableCell>

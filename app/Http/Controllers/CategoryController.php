@@ -2,20 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-use function Pest\Laravel\delete;
-
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    protected CategoryService $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     public function index()
     {
-        $categories = Category::withCount('courses')->latest()->paginate(10);
+
+        $categories = $this->categoryService->paginateCategories(10);
+
         return Inertia::render('admin/categories', ['categories' => $categories]);
     }
 
@@ -36,10 +41,12 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories',
         ]);
 
-        Category::create($validated);
+        $new_category = $this->categoryService->createCategory($validated);
 
         return redirect()->route('admin.categories.index')
-        ->with('success', 'Category Added Successfully');
+        ->with('success', 'Category Added Successfully')
+        ->with('data', $new_category);
+
     }
 
     /**
@@ -61,16 +68,14 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
-
-        $category = Category::findOrFail($id);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
-        $category->update($validated);
+        $this->categoryService->updateCategory($id, $validated);
 
         return redirect()->route('admin.categories.index')
         ->with('success', 'Category Updated Successfully');
@@ -79,16 +84,16 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
-        $category = Category::findOrFail($id);
+        $category = $this->categoryService->findCategory($id);
 
         if ($category->courses()->count() > 0) {
             return redirect()->route('admin.categories.index')
         ->with('success', 'Category Cannot be Deleted Because Courses Are associated with it!');
         }
 
-        $category->destroy($id);
+        $this->categoryService->deleteCategory($id);
 
         return redirect()->route('admin.categories.index')
         ->with('success', 'Category Deleted Successfully');
