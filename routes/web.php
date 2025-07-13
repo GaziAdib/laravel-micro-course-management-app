@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ModuleController;
 
 Route::get('/', function () {
@@ -31,7 +32,12 @@ Route::put('/admin/course/{course}/module/{module}', [ModuleController::class, '
 Route::delete('/admin/course/{course}/module/{module}', [ModuleController::class, 'destroy'])->name('admin.modules.destroy');
 
 
+// Custom Lessons routes for a course
+Route::get('/admin/lessons', [LessonController::class, 'index'])->name('admin.lessons.index');
+Route::post('/admin/{module}/lesson/add', [LessonController::class, 'store'])->name('admin.lessons.store');
+Route::put('/admin/{module}/lesson/{lesson}', [LessonController::class, 'update'])->name('admin.lesons.update');
+Route::delete('/admin/{module}/lesson/{lesson}', [LessonController::class, 'destroy'])->name('admin.lessons.destroy');
 
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

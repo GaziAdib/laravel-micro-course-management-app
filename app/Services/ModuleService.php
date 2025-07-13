@@ -16,6 +16,15 @@ class ModuleService
             ->paginate($perPage);
     }
 
+    public function fetchModulesWithIdTitle()
+
+    {
+        return Module::With(['course:id,title'])->get(['id', 'title', 'course_id']);
+    }
+
+
+
+
     public function createModule(array $data, int $courseId): Module
     {
         return Module::where('course_id', $courseId)->create($data);
@@ -33,7 +42,7 @@ class ModuleService
                         ->firstOrFail()
                         ->update($data);
 
-        return Module::findOrFail($id)->update($data);
+        #return Module::findOrFail($id)->update($data);
     }
 
     public function deleteModule(int $courseId, int $id): bool

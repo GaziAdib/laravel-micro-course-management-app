@@ -52,6 +52,11 @@ export function AppSidebar() {
         href: '/admin/modules',
         icon: PenSquare,
     },
+    {
+        title: 'Lessons',
+        href: '/admin/lessons',
+        icon: FolderPlus,
+    },
 ]: user?.role === 'user' ? [
     {
         title: 'Courses',
