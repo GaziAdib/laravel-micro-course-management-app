@@ -60,7 +60,7 @@ export function AppSidebar() {
 ]: user?.role === 'user' ? [
     {
         title: 'Courses',
-        href: '/courses',
+        href: '/user/courses',
         icon: BookOpen,
     },
 ]: [];

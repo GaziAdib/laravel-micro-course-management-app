@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\UserCourseController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -38,6 +39,11 @@ Route::post('/admin/{module}/lesson/add', [LessonController::class, 'store'])->n
 Route::put('/admin/{module}/lesson/{lesson}', [LessonController::class, 'update'])->name('admin.lesons.update');
 Route::delete('/admin/{module}/lesson/{lesson}', [LessonController::class, 'destroy'])->name('admin.lessons.destroy');
 
+
+Route::middleware(['auth'])->prefix('user')->group(function() {
+    Route::get('/courses', [UserCourseController::class, 'index'])->name('user.courses.index');
+    Route::get('/course/{course}', [UserCourseController::class, 'show'])->name('user.courses.show');
+});
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
