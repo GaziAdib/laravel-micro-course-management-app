@@ -9,7 +9,11 @@ class ModuleService
 {
     public function paginateModules(int $perPage = 10): Paginator
     {
-        return Module::withCount('lessons')->latest()->paginate($perPage);
+        #return Module::withCount('lessons')->latest()->paginate($perPage);
+        return Module::with('course')
+            ->withCount('lessons')
+            ->latest()
+            ->paginate($perPage);
     }
 
     public function createModule(array $data, int $courseId): Module

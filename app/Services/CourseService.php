@@ -31,6 +31,11 @@ class CourseService
         return Course::findOrFail($id)->delete();
     }
 
+    public function fetchCoursesWithIdTitle()
+    {
+        return Course::all(['id', 'title']);
+    }
+
     public function getAllCategories()
     {
         return Category::all();

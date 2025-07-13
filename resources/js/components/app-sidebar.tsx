@@ -49,7 +49,7 @@ export function AppSidebar() {
     },
     {
         title: 'Modules',
-        href: '/course/modules',
+        href: '/admin/modules',
         icon: PenSquare,
     },
 ]: user?.role === 'user' ? [

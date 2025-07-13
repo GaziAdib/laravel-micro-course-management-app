@@ -22,14 +22,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('courses', CourseController::class)->except(['show']);
-
-    // Custom module routes for a course
-    Route::get('course/modules', [ModuleController::class, 'index'])->name('courses.modules.index');
-    Route::post('course/{course}/module/add', [ModuleController::class, 'store'])->name('courses.modules.store');
-    Route::put('course/{course}/module/{module}', [ModuleController::class, 'update'])->name('courses.modules.update');
-    Route::delete('course/{course}/module/{module}', [ModuleController::class, 'destroy'])->name('courses.modules.destroy');
-
 });
+
+// Custom module routes for a course
+Route::get('/admin/modules', [ModuleController::class, 'index'])->name('admin.modules.index');
+Route::post('/admin/course/{course}/module/add', [ModuleController::class, 'store'])->name('admin.modules.store');
+Route::put('/admin/course/{course}/module/{module}', [ModuleController::class, 'update'])->name('admin.modules.update');
+Route::delete('/admin/course/{course}/module/{module}', [ModuleController::class, 'destroy'])->name('admin.modules.destroy');
+
 
 
 

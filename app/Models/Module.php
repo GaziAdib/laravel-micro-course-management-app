@@ -12,10 +12,16 @@ class Module extends Model
 
     protected $fillable = [
         'title',
+        'description',
         'is_paid',
         'is_published',
         'order',
         'course_id'
+    ];
+
+    protected $casts = [
+    'is_published' => 'boolean',
+    'is_paid' => 'boolean',
     ];
 
     public function lessons() {
@@ -23,6 +29,6 @@ class Module extends Model
     }
 
     public function course() {
-        return $this->belongsToy(Course::class);
+        return $this->belongsTo(Course::class);
     }
 }

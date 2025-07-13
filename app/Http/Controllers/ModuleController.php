@@ -5,22 +5,26 @@ namespace App\Http\Controllers;
 use App\Services\ModuleService;
 use App\Models\Course;
 use App\Models\Module;
+use App\Services\CourseService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ModuleController extends Controller
 {
     protected ModuleService $moduleService;
+    protected CourseService $courseService;
 
-    public function __construct(ModuleService $moduleService)
+    public function __construct(ModuleService $moduleService, CourseService $courseService)
     {
         $this->moduleService = $moduleService;
+        $this->courseService = $courseService;
     }
 
     public function index()
     {
         $modules = $this->moduleService->paginateModules(10);
-        return Inertia::render('admin.modules', ['modules' => $modules]);
+        $courses = $this->courseService->fetchCoursesWithIdTitle();
+        return Inertia::render('admin/modules', ['modules' => $modules, 'courses' => $courses]);
     }
 
     /**
@@ -37,11 +41,16 @@ class ModuleController extends Controller
     public function store(Request $request, Course $course)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories',
+            'title' => 'required|string|max:255|unique:modules',
+            'description' => 'required|string|max:500',
+            'is_paid' => 'sometimes|boolean',
+            'is_published' => 'sometimes|boolean',
+            'order' => 'required|integer',
+            'course_id' => 'required|integer|exists:courses,id',
         ]);
 
-        $new_module = $this->moduleService->createModule($validated, $course->id);
 
+        $new_module = $this->moduleService->createModule($validated, $course->id);
         return redirect()->route('admin.modules.index')
             ->with('success', 'New Module Added Successfully')
             ->with('data', $new_module);
@@ -66,15 +75,15 @@ class ModuleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Module $module, Course $course)
+    public function update(Request $request, Course $course, Module $module)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255|unique:modules',
-            'description' => 'nullable|string|max:1000',
-            'course_id' => 'required|integer|exists:courses,id',
-            'is_paid' => 'required|boolean',
-            'is_published' => 'required|boolean',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|max:500',
+            'is_paid' => 'sometimes|boolean',
+            'is_published' => 'sometimes|boolean',
             'order' => 'required|integer',
+            'course_id' => 'required|integer|exists:courses,id',
         ]);
 
 
@@ -95,12 +104,12 @@ class ModuleController extends Controller
 
         if ($module->lessons()->count() > 0) {
             return redirect()->route('admin.modules.index')
-        ->with('success', 'Module Cannot be Deleted Because Lessons Are associated with it!');
+                ->with('success', 'Module Cannot be Deleted Because Lessons Are associated with it!');
         }
 
         $this->moduleService->deleteModule($course->id, $module->id);
 
         return redirect()->route('admin.modules.index')
-        ->with('success', 'Module Deleted Successfully');
+            ->with('success', 'Module Deleted Successfully');
     }
 }

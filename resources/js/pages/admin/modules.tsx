@@ -23,17 +23,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
-
+interface Course {
+    id: number;
+    title: string;
+}
 
 interface Module {
     id: number;
     title: string;
+    course: Course;
     description: string;
     course_id: number | string;
-    is_paid: boolean | string;
-    is_published: boolean | string;
+    is_paid: boolean
+    is_published: boolean
     lessons_count?: number;
     order: number
 }
@@ -54,6 +59,7 @@ interface PaginatedData {
 
 interface ModulesPageProps {
     modules: PaginatedData;
+    courses: Course[]
 }
 
 
@@ -73,7 +79,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ModulesPage({ modules }: ModulesPageProps) {
+export default function ModulesPage({ modules, courses }: ModulesPageProps) {
     const [showModal, setShowModal] = useState(false);
     const [editModule, setEditModule] = useState<Module | null>(null);
     const [formData, setFormData] = useState<ModuleFormData>({
@@ -93,13 +99,21 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
 
     const handleEdit = (module: Module) => {
         setEditModule(module);
-        setFormData({ title: module.title, order: module.order, description: module.description, is_paid: module.is_paid, is_published: module.is_published, course_id: module.course_id });
+        console.log('Module Info', module)
+        setFormData({
+            title: module.title,
+            order: module.order,
+            description: module.description,
+            is_paid: module.is_paid,
+            is_published: module.is_published,
+            course_id: module.course_id
+        });
         setShowModal(true);
     };
 
-    // const handleCourseChange = (value) => {
-    //     setFormData({ ...formData, course_id: value ? Number(value) : '' });
-    // };
+    const handleCourseChange = (value: Course) => {
+        setFormData({ ...formData, course_id: value ? Number(value) : '' });
+    };
 
     const handleDelete = (id: number, courseId: number) => {
         if (confirm('Are you sure you want to delete this module?')) {
@@ -128,7 +142,7 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
                 },
             });
         } else {
-            router.post(`/admin/course/${courseId}/module/add`, formData, {
+            router.post(`/admin/course/${formData?.course_id}/module/add`, formData, {
                 onSuccess: () => {
                     setShowModal(false);
                     toast.success('Module created successfully');
@@ -173,7 +187,10 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Title</TableHead>
-                                <TableHead>CourseID</TableHead>
+                                <TableHead>Course</TableHead>
+                                <TableHead>Order</TableHead>
+                                <TableHead>Publish Status</TableHead>
+                                <TableHead>Paid Status</TableHead>
                                 <TableHead>Lessons Count</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
@@ -182,7 +199,10 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
                             {modules?.data?.map((module) => (
                                 <TableRow key={module.id}>
                                     <TableCell>{module?.title}</TableCell>
-                                    <TableCell>{module?.course_id}</TableCell>
+                                    <TableCell>{module?.course?.title}</TableCell>
+                                    <TableCell>{module?.order}</TableCell>
+                                    <TableCell>{module?.is_published ? 'Published' : 'Pending'}</TableCell>
+                                    <TableCell>{module?.is_paid ? 'Paid' : 'Free'}</TableCell>
                                     <TableCell>{module?.lessons_count}</TableCell>
                                     <TableCell>
                                         <div className="flex gap-2">
@@ -271,7 +291,7 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="name">Title</Label>
+                                <Label htmlFor="title">Title</Label>
                                 <Input
                                     id="title"
                                     name="title"
@@ -291,6 +311,29 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
                                 />
                             </div>
 
+                            <div className="space-y-2">
+                                <Label htmlFor="course_id">Course</Label>
+                                <Select
+                                    value={formData.course_id.toString()}
+                                    onValueChange={handleCourseChange}
+                                    required
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select course" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {courses?.map((course) => (
+                                            <SelectItem
+                                                key={course.id}
+                                                value={course.id.toString()}
+                                            >
+                                                {course.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
 
 
                             {/* Toggle for is_paid */}
@@ -298,8 +341,9 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
                                 <Label htmlFor="is_paid">Paid Module</Label>
                                 <Switch
                                     id="is_paid"
+                                    name="is_paid"
                                     checked={formData.is_paid}
-                                    onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
+                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_paid: checked }))}
                                 />
                             </div>
 
@@ -308,8 +352,12 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
                                 <Label htmlFor="is_published">Publish Module</Label>
                                 <Switch
                                     id="is_published"
+                                    name="is_published"
                                     checked={formData.is_published}
-                                    onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
+                                    onCheckedChange={(checked) => setFormData(prev => ({
+                                        ...prev,
+                                        is_published: checked
+                                    }))}
                                 />
                             </div>
 
@@ -324,10 +372,6 @@ export default function ModulesPage({ modules }: ModulesPageProps) {
                                     min="0"
                                 />
                             </div>
-
-
-
-
 
                             <DialogFooter>
                                 <Button
