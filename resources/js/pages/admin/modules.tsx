@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 
 interface Course {
@@ -155,7 +156,7 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -303,11 +304,12 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="description">Description</Label>
-                                <Input
+                                <Textarea
                                     id="description"
                                     name="description"
                                     value={formData.description}
                                     onChange={handleInputChange}
+                                    placeholder="Enter Module Desciption ..."
                                     required
                                 />
                             </div>

@@ -23,6 +23,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 
 
 interface Category {
@@ -73,8 +75,9 @@ type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
 interface CourseFormData {
     title: string;
     description: string;
-    price: number; // Keep as string in state for input handling
+    price: number;
     duration: string;
+    is_featured: boolean;
     level: CourseLevel | '';
     category_id: number | string;
 }
@@ -94,19 +97,20 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
         description: '',
         price: 0.00,
         duration: '',
+        is_featured: false,
         level: '' as CourseLevel | '',
         category_id: '' as string | number | '',
     });
 
     const handleAdd = () => {
         setEditCourse(null);
-        setFormData({ title: '', price: 0.00, description: '', duration: '', level: '', category_id: '' });
+        setFormData({ title: '', price: 0.00, description: '', duration: '', is_featured: false, level: '', category_id: '' });
         setShowModal(true);
     };
 
     const handleEdit = (course: Course) => {
         setEditCourse(course);
-        setFormData({ title: course.title, price: course.price, description: course.description, duration: course.duration, level: course.level, category_id: course.category.id });
+        setFormData({ title: course.title, price: course.price, description: course.description, duration: course.duration, is_featured:course.is_featured, level: course.level, category_id: course.category.id });
         setShowModal(true);
     };
 
@@ -141,7 +145,7 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
                     toast.success('Course updated successfully');
                 },
                 onError: (errors) => {
-                    toast.error(errors.name || 'Failed to update category');
+                    toast.error(errors.name || 'Failed to update course');
                 },
             });
         } else {
@@ -157,7 +161,7 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -284,7 +288,7 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>
-                                {editCourse ? 'Edit Category' : 'Add Category'}
+                                {editCourse ? 'Edit Course' : 'Add Course'}
                             </DialogTitle>
                             <DialogDescription>
                                 {editCourse ? 'Make changes to your category here.' : 'Create a new category here.'}
@@ -301,13 +305,16 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
                                     required
                                 />
                             </div>
+
                             <div className="space-y-2">
                                 <Label htmlFor="description">Description</Label>
-                                <Input
+                                <Textarea
                                     id="description"
                                     name="description"
                                     value={formData.description}
+                                    placeholder="Enter Course Description"
                                     onChange={handleInputChange}
+                                    className="min-h-[50px]"
                                     required
                                 />
                             </div>
@@ -355,6 +362,16 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="is_paid">is Featured ? (True/False)</Label>
+                                <Switch
+                                    id="is_featured"
+                                    name="is_featured"
+                                    checked={formData.is_featured}
+                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_featured: checked }))}
+                                />
                             </div>
 
 
