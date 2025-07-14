@@ -5,9 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ModuleLists from '@/components/listings/ModuleLists';
 
+
+
 export default function CourseDetailPage({ course }) {
+
+    const breadcrumbs = [
+    {
+        title: `Courses / ${course.title} / Detail`,
+        href: `/user/courses/${course.id}`,
+    },
+];
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={course.title} />
 
             <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
