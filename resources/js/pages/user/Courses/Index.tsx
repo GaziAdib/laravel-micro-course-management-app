@@ -189,10 +189,12 @@ export default function CoursesPage() {
                                     </div>
                                 </CardContent>
 
+
                                 <CardFooter className="px-5 pb-5 pt-0">
                                     <Button asChild className="w-full">
-                                        <Link href={`/courses/${course.id}`}>View Details</Link>
+                                        <Link href={route('user.courses.show', course.id)}>View Details</Link>
                                     </Button>
+
                                 </CardFooter>
                             </Card>
                         ))}

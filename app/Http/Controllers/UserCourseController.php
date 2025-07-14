@@ -38,19 +38,44 @@ class UserCourseController extends Controller
             ->paginate(12); // Actually execute the query
 
         // Remove the dd() to allow execution to continue
-        return Inertia::render('user/courses', [
+        return Inertia::render('user/Courses/Index', [
             'courses' => $courses,
             'filters' => $request->only(['search', 'sort'])
         ]);
     }
 
 
-    public function show(Course $courseId)
+    public function show($courseId)
     {
 
-        $course = Course::where('id', $courseId)->where('is_published', true)->with(['category', 'reviews.user'])->paginate(10);
+        // $course = Course::where('id', $courseId)
+        // ->where('is_published', true)
+        // ->with(['category', 'reviews.user', 'modules'])
+        // ->firstOrFail();
 
-        return Inertia::render('user/courses', [
+        // $course = Course::with(['category', 'modules.lessons', 'reviews.user'])
+        //         ->order
+        //         ->findOrFail($courseId);
+
+        // $course = Course::find($courseId);
+        // dd($course);
+
+        // dd($course);
+
+        $course = Course::with([
+            'category',
+            'modules' => function ($query) {
+                $query->orderBy('order', 'asc')
+                    ->with(['lessons' => function ($q) {
+                        $q->orderBy('order', 'asc');
+                    }]);
+            },
+            'reviews.user'
+        ])
+            ->findOrFail($courseId);
+
+
+        return Inertia::render('user/Courses/Show/Show', [
             'course' => $course
         ]);
     }

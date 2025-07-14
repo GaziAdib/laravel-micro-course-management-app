@@ -42,8 +42,9 @@ Route::delete('/admin/{module}/lesson/{lesson}', [LessonController::class, 'dest
 
 Route::middleware(['auth'])->prefix('user')->group(function() {
     Route::get('/courses', [UserCourseController::class, 'index'])->name('user.courses.index');
-    Route::get('/course/{course}', [UserCourseController::class, 'show'])->name('user.courses.show');
+    Route::get('/courses/{course}', [UserCourseController::class, 'show'])->name('user.courses.show');
 });
+
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
