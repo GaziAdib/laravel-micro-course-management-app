@@ -13,11 +13,34 @@ class UserCourseController extends Controller
     {
 
 
-        $courses = Course::with(['modules', 'category', 'reviews'])->paginate(10);
+        // $courses = Course::with(['modules', 'category', 'reviews'])->paginate(10);
 
+        // return Inertia::render('user/courses', [
+        //     'courses' => $courses,
+        //     'filters' => $request->only(['search', 'sort', 'category'])
+        // ]);
+
+
+        $courses = Course::with(['modules', 'category', 'reviews'])
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->sort, function ($query, $sort) {
+                match ($sort) {
+                    'price-low' => $query->orderBy('price', 'asc'),
+                    'price-high' => $query->orderBy('price', 'desc'),
+                    default => $query->latest(),
+                };
+            })
+            ->paginate(12); // Actually execute the query
+
+        // Remove the dd() to allow execution to continue
         return Inertia::render('user/courses', [
             'courses' => $courses,
-            'filters' => $request->only(['search', 'sort', 'category'])
+            'filters' => $request->only(['search', 'sort'])
         ]);
     }
 

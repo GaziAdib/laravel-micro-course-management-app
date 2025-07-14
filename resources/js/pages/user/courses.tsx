@@ -1,49 +1,53 @@
-import { Head, Link, usePage } from '@inertiajs/react'
-import { Clock, Layers, MessageSquare, StarsIcon } from 'lucide-react'
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Clock, Layers, MessageSquare, Search, ArrowDown, Star } from 'lucide-react';
 import {
     Card,
     CardHeader,
     CardTitle,
-    CardDescription,
     CardContent,
     CardFooter,
-} from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Star } from 'lucide-react'
-import AppLayout from '@/layouts/app-layout'
-import { BreadcrumbItem } from '@/types'
-import { Breadcrumb } from '@/components/ui/breadcrumb'
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { useDebouncedCallback } from 'use-debounce';
+import { useState } from 'react';
 
 interface Course {
-    id: number
-    title: string
-    description: string
-    price: number
-    duration: string
-    is_paid: boolean
-    level: 'beginner' | 'intermediate' | 'advanced'
-    is_featured: boolean
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    duration: string;
+    is_paid: boolean;
+    level: 'beginner' | 'intermediate' | 'advanced';
+    is_featured: boolean;
     category: {
-        id: number
-        name: string
-    }
-    image_url?: string
-    created_at: string
-    updated_at: string
+        id: number;
+        name: string;
+    };
+    image_url?: string;
+    created_at: string;
+    updated_at: string;
+    modules?: Array<{ id: number }>;
+    reviews?: Array<{ id: number }>;
 }
 
 interface PaginatedResults<T> {
-    data: T[]
+    data: T[];
     links: {
-        url: string | null
-        label: string
-        active: boolean
-    }[]
-    current_page: number
-    last_page: number
-    per_page: number
-    total: number
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -54,11 +58,23 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CoursesPage() {
-    const { courses } = usePage<{ courses: PaginatedResults<Course> }>().props
+    const { courses, filters } = usePage<{
+        courses: PaginatedResults<Course>;
+        filters: { search?: string; sort?: string };
+    }>().props;
+
+    const [searchTerm, setSearchTerm] = useState(filters.search || '');
+    const debouncedSearch = useDebouncedCallback((value: string) => {
+        router.get(
+            route('user.courses.index'),
+            { search: value },
+            { preserveState: true, replace: true }
+        );
+    }, 500);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <div className="min-h-screen flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8 bg-background">
+            <div className="min-h-screen flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 bg-background">
                 <Head title="Courses" />
 
                 <div className="max-w-7xl w-full text-center mb-10">
@@ -70,92 +86,566 @@ export default function CoursesPage() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 w-full max-w-7xl">
-                    {courses?.data?.map((course) => (
-                        <Card
-                            key={course.id}
-                            className="relative h-full flex flex-col hover:shadow-lg transition-all border border-border"
-                        >
-                            {course.is_featured && (
-                                <div className="absolute top-3 left-3 z-10">
-                                    <Badge className="bg-green-900 border-green-200 border-2 text-white flex items-center gap-1 text-xs px-2 py-0.5 shadow-sm">
-                                        <Star className="h-3 w-3 text-white" />
-                                        Featured
-                                    </Badge>
-                                </div>
+                {/* Search and Sort Controls */}
+                <div className="w-full max-w-7xl mb-8 flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search courses..."
+                            className="pl-10"
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                debouncedSearch(e.target.value);
+                            }}
+                        />
+                    </div>
+
+                    <div className="w-full sm:w-48">
+                        <Select
+                            value={filters.sort || 'default'}
+                            onValueChange={(sort) => router.get(
+                                route('user.courses.index'),
+                                { sort: sort !== 'default' ? sort : undefined },
+                                { preserveState: true }
                             )}
-
-                            <CardHeader className="p-0">
-                                <div className="aspect-video overflow-hidden rounded-t-md bg-muted">
-                                    <img
-                                        src={
-                                            course.image_url
-                                                ? course.image_url
-                                                : 'https://i.ytimg.com/vi/p0iWbtHPel4/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLAr8RkZINpmZyn-m1gZbZZLwiDHhg'
-                                        }
-                                        alt={course.title}
-                                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                                    />
-                                </div>
-                            </CardHeader>
-
-                            <CardContent className="flex-grow p-5 flex flex-col">
-                                <div className="flex justify-between items-center mb-3">
-                                    <Badge variant="outline">{course.category.name}</Badge>
-                                    <Badge
-                                        variant={
-                                            course.level === 'beginner'
-                                                ? 'success'
-                                                : course.level === 'intermediate'
-                                                    ? 'secondary'
-                                                    : 'destructive'
-                                        }
-                                    >
-                                        {course.level}
-                                    </Badge>
-                                </div>
-
-                                <CardTitle className="text-lg font-semibold mb-2 line-clamp-2">
-                                    {course.title}
-                                </CardTitle>
-
-                                {/* Meta Info Row */}
-                                <div className="flex flex-col gap-2 text-sm text-muted-foreground mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <Layers className="h-4 w-4" />
-                                        <span>{course.modules.length} Modules</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <MessageSquare className="h-4 w-4" />
-                                        <span>{course.reviews.length} Reviews</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="h-4 w-4" />
-                                        <span>{course.duration}</span>
-                                    </div>
-                                </div>
-
-                                <div className="mt-auto flex justify-between items-center text-sm">
-                                    {course.is_paid ? (
-                                        <span className="font-semibold text-primary">${course.price}</span>
-                                    ) : (
-                                        <Badge variant="success">Free</Badge>
-                                    )}
-                                </div>
-                            </CardContent>
-
-                            <CardFooter className="px-5 pb-5 pt-0">
-                                <Button asChild className="w-full">
-                                    <Link href={`/courses/${course.id}`}>View Details</Link>
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    ))}
+                        >
+                            <SelectTrigger className="w-full">
+                                <ArrowDown className="mr-2 h-4 w-4" />
+                                <SelectValue placeholder="Sort by" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="default">Newest</SelectItem>
+                                <SelectItem value="price-low">Price: Low to High</SelectItem>
+                                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
+
+                {/* Courses Grid */}
+                {courses.data.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 w-full max-w-7xl">
+                        {courses.data.map((course) => (
+                            <Card key={course.id} className="relative h-full flex flex-col hover:shadow-lg transition-all border border-border">
+                                {course.is_featured && (
+                                    <div className="absolute top-3 left-3 z-10">
+                                        <Badge className="bg-green-900 border-green-200 border-2 text-white flex items-center gap-1 text-xs px-2 py-0.5 shadow-sm">
+                                            <Star className="h-3 w-3 text-white" />
+                                            Featured
+                                        </Badge>
+                                    </div>
+                                )}
+
+                                <CardHeader className="p-0">
+                                    <div className="aspect-video overflow-hidden rounded-t-md bg-muted">
+                                        <img
+                                            src={course.image_url || 'https://i.ytimg.com/vi/p0iWbtHPel4/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLAr8RkZINpmZyn-m1gZbZZLwiDHhg'}
+                                            alt={course.title}
+                                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                                        />
+                                    </div>
+                                </CardHeader>
+
+                                <CardContent className="flex-grow p-5 flex flex-col">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <Badge variant="outline">{course.category.name}</Badge>
+                                        <Badge
+                                            variant={
+                                                course.level === 'beginner' ? 'success' :
+                                                course.level === 'intermediate' ? 'secondary' :
+                                                'destructive'
+                                            }
+                                        >
+                                            {course.level}
+                                        </Badge>
+                                    </div>
+
+                                    <CardTitle className="text-lg font-semibold mb-2 line-clamp-2">
+                                        {course.title}
+                                    </CardTitle>
+
+                                    <div className="flex flex-col gap-2 text-sm text-muted-foreground mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <Layers className="h-4 w-4" />
+                                            <span>{course.modules?.length || 0} Modules</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <MessageSquare className="h-4 w-4" />
+                                            <span>{course.reviews?.length || 0} Reviews</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Clock className="h-4 w-4" />
+                                            <span>{course.duration}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-auto flex justify-between items-center text-sm">
+                                        {course.is_paid ? (
+                                            <span className="font-semibold text-primary">${course.price}</span>
+                                        ) : (
+                                            <Badge variant="success">Free</Badge>
+                                        )}
+                                    </div>
+                                </CardContent>
+
+                                <CardFooter className="px-5 pb-5 pt-0">
+                                    <Button asChild className="w-full">
+                                        <Link href={`/courses/${course.id}`}>View Details</Link>
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="w-full max-w-7xl py-12 flex flex-col items-center justify-center text-center">
+                        <Search className="h-12 w-12 text-muted-foreground mb-4" />
+                        <h3 className="text-xl font-medium text-foreground">No courses found</h3>
+                        <p className="text-muted-foreground mt-2">
+                            Try adjusting your search or filter criteria
+                        </p>
+                    </div>
+                )}
             </div>
         </AppLayout>
-    )
+    );
 }
+
+
+// import { Head, Link, router, usePage } from '@inertiajs/react'
+// import { Clock, Layers, MessageSquare, StarsIcon, Search, ArrowDown } from 'lucide-react'
+
+// import {
+//     Card,
+//     CardHeader,
+//     CardTitle,
+//     CardDescription,
+//     CardContent,
+//     CardFooter,
+// } from '@/components/ui/card'
+// import { Button } from '@/components/ui/button'
+// import { Badge } from '@/components/ui/badge'
+// import { Star } from 'lucide-react'
+// import AppLayout from '@/layouts/app-layout'
+// import { BreadcrumbItem } from '@/types'
+// import { Breadcrumb } from '@/components/ui/breadcrumb'
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// import { Input } from '@/components/ui/input'
+
+// import { useDebounce, useDebouncedCallback } from 'use-debounce'
+// import { useEffect, useState } from 'react'
+
+
+
+// interface Course {
+//     id: number
+//     title: string
+//     description: string
+//     price: number
+//     duration: string
+//     is_paid: boolean
+//     level: 'beginner' | 'intermediate' | 'advanced'
+//     is_featured: boolean
+//     category: {
+//         id: number
+//         name: string
+//     }
+//     image_url?: string
+//     created_at: string
+//     updated_at: string
+// }
+
+// interface PaginatedResults<T> {
+//     data: T[]
+//     links: {
+//         url: string | null
+//         label: string
+//         active: boolean
+//     }[]
+//     current_page: number
+//     last_page: number
+//     per_page: number
+//     total: number
+// }
+
+
+// const breadcrumbs: BreadcrumbItem[] = [
+//     {
+//         title: 'Courses',
+//         href: '/user/courses',
+//     },
+// ];
+
+// export default function CourseListingsPage() {
+//     const { courses, filters } = usePage<{
+//     courses: PaginatedResults<Course>;
+//     filters: {
+//       search?: string;
+//       sort?: string;
+//     };
+//   }>().props;
+
+//   console.log('courses', courses.data)
+
+//     const [searchTerm, setSearchTerm] = useState(filters.search || '');
+//     const [sortBy, setSortBy] = useState(filters.sort || '')
+
+
+//     const debouncedSearch = useDebouncedCallback((value) => {
+//     router.get(
+//       route('courses.index'),
+//       { search: value },
+//       { preserveState: true, replace: true }
+//     );
+//   }, 500);
+
+//     return (
+//         <AppLayout breadcrumbs={breadcrumbs}>
+//             <div className="min-h-screen flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8 bg-background">
+//                 <Head title="Courses" />
+
+//                 <div className="max-w-7xl w-full text-center mb-10">
+//                     <h1 className="text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-red-500">
+//                         Explore Our Courses
+//                     </h1>
+//                     <p className="text-muted-foreground mt-2 text-lg">
+//                         Find the perfect course to advance your skills
+//                     </p>
+//                 </div>
+
+//                 {/* Search and Sort Controls */}
+//                 <div className="w-full max-w-7xl mb-8 flex flex-col sm:flex-row gap-4">
+//                     <div className="relative max-w-md mb-6">
+//                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+//                         <Input
+//                             placeholder="Search courses..."
+//                             className="pl-10"
+//                             defaultValue={filters.search}
+//                             onChange={(e) => {
+//                                 setSearchTerm(e.target.value);
+//                                 debouncedSearch(e.target.value);
+//                             }}
+//                         />
+//                     </div>
+
+//                     <div className="w-full sm:w-48">
+//                         <Select
+//                             defaultValue={filters.sort || 'default'}
+//                             onValueChange={(sort) => router.get(route('user.courses.index'), { sort }, { preserveState: true })}
+//                         >
+//                             <SelectTrigger className="w-[180px]">
+//                                 <ArrowDown className="mr-2 h-4 w-4" />
+//                                 <SelectValue placeholder="Sort by" />
+//                             </SelectTrigger>
+//                             <SelectContent>
+//                                 <SelectItem value="default">Newest</SelectItem>
+//                                 <SelectItem value="price-low">Price: Low to High</SelectItem>
+//                                 <SelectItem value="price-high">Price: High to Low</SelectItem>
+//                                 <SelectItem value="featured">Featured First</SelectItem>
+//                             </SelectContent>
+//                         </Select>
+//                     </div>
+//                 </div>
+
+//                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 w-full max-w-7xl">
+//                     {courses.data?.map((course) => (
+//                         <Card
+//                             key={course.id}
+//                             className="relative h-full flex flex-col hover:shadow-lg transition-all border border-border"
+//                         >
+//                             {course.is_featured && (
+//                                 <div className="absolute top-3 left-3 z-10">
+//                                     <Badge className="bg-green-900 border-green-200 border-2 text-white flex items-center gap-1 text-xs px-2 py-0.5 shadow-sm">
+//                                         <Star className="h-3 w-3 text-white" />
+//                                         Featured
+//                                     </Badge>
+//                                 </div>
+//                             )}
+
+//                             <CardHeader className="p-0">
+//                                 <div className="aspect-video overflow-hidden rounded-t-md bg-muted">
+//                                     <img
+//                                         src={
+//                                             course.image_url
+//                                                 ? course.image_url
+//                                                 : 'https://i.ytimg.com/vi/p0iWbtHPel4/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLAr8RkZINpmZyn-m1gZbZZLwiDHhg'
+//                                         }
+//                                         alt={course.title}
+//                                         className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+//                                     />
+//                                 </div>
+//                             </CardHeader>
+
+//                             <CardContent className="flex-grow p-5 flex flex-col">
+//                                 <div className="flex justify-between items-center mb-3">
+//                                     <Badge variant="outline">{course.category.name}</Badge>
+//                                     <Badge
+//                                         variant={
+//                                             course.level === 'beginner'
+//                                                 ? 'success'
+//                                                 : course.level === 'intermediate'
+//                                                     ? 'secondary'
+//                                                     : 'destructive'
+//                                         }
+//                                     >
+//                                         {course.level}
+//                                     </Badge>
+//                                 </div>
+
+//                                 <CardTitle className="text-lg font-semibold mb-2 line-clamp-2">
+//                                     {course.title}
+//                                 </CardTitle>
+
+//                                 {/* Meta Info Row */}
+//                                 <div className="flex flex-col gap-2 text-sm text-muted-foreground mb-4">
+//                                     <div className="flex items-center gap-2">
+//                                         <Layers className="h-4 w-4" />
+//                                         <span>{course.modules.length} Modules</span>
+//                                     </div>
+//                                     <div className="flex items-center gap-2">
+//                                         <MessageSquare className="h-4 w-4" />
+//                                         <span>{course.reviews.length} Reviews</span>
+//                                     </div>
+//                                     <div className="flex items-center gap-2">
+//                                         <Clock className="h-4 w-4" />
+//                                         <span>{course.duration}</span>
+//                                     </div>
+//                                 </div>
+
+//                                 <div className="mt-auto flex justify-between items-center text-sm">
+//                                     {course.is_paid ? (
+//                                         <span className="font-semibold text-primary">${course.price}</span>
+//                                     ) : (
+//                                         <Badge variant="success">Free</Badge>
+//                                     )}
+//                                 </div>
+//                             </CardContent>
+
+//                             <CardFooter className="px-5 pb-5 pt-0">
+//                                 <Button asChild className="w-full">
+//                                     <Link href={`/courses/${course.id}`}>View Details</Link>
+//                                 </Button>
+//                             </CardFooter>
+//                         </Card>
+//                     ))}
+//                 </div>
+//             </div>
+//         </AppLayout>
+//     )
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import { Head, Link, usePage } from '@inertiajs/react'
+// import { Clock, Layers, MessageSquare, StarsIcon } from 'lucide-react'
+// import {
+//     Card,
+//     CardHeader,
+//     CardTitle,
+//     CardDescription,
+//     CardContent,
+//     CardFooter,
+// } from '@/components/ui/card'
+// import { Button } from '@/components/ui/button'
+// import { Badge } from '@/components/ui/badge'
+// import { Star } from 'lucide-react'
+// import AppLayout from '@/layouts/app-layout'
+// import { BreadcrumbItem } from '@/types'
+// import { Breadcrumb } from '@/components/ui/breadcrumb'
+
+// interface Course {
+//     id: number
+//     title: string
+//     description: string
+//     price: number
+//     duration: string
+//     is_paid: boolean
+//     level: 'beginner' | 'intermediate' | 'advanced'
+//     is_featured: boolean
+//     category: {
+//         id: number
+//         name: string
+//     }
+//     image_url?: string
+//     created_at: string
+//     updated_at: string
+// }
+
+// interface PaginatedResults<T> {
+//     data: T[]
+//     links: {
+//         url: string | null
+//         label: string
+//         active: boolean
+//     }[]
+//     current_page: number
+//     last_page: number
+//     per_page: number
+//     total: number
+// }
+
+// const breadcrumbs: BreadcrumbItem[] = [
+//     {
+//         title: 'Courses',
+//         href: '/user/courses',
+//     },
+// ];
+
+// export default function CoursesPage() {
+//     const { courses } = usePage<{ courses: PaginatedResults<Course> }>().props
+
+
+
+
+//     return (
+//         <AppLayout breadcrumbs={breadcrumbs}>
+//             <div className="min-h-screen flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8 bg-background">
+//                 <Head title="Courses" />
+
+//                 <div className="max-w-7xl w-full text-center mb-10">
+//                     <h1 className="text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-red-500">
+//                         Explore Our Courses
+//                     </h1>
+//                     <p className="text-muted-foreground mt-2 text-lg">
+//                         Find the perfect course to advance your skills
+//                     </p>
+//                 </div>
+
+//                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 w-full max-w-7xl">
+//                     {courses?.data?.map((course) => (
+//                         <Card
+//                             key={course.id}
+//                             className="relative h-full flex flex-col hover:shadow-lg transition-all border border-border"
+//                         >
+//                             {course.is_featured && (
+//                                 <div className="absolute top-3 left-3 z-10">
+//                                     <Badge className="bg-green-900 border-green-200 border-2 text-white flex items-center gap-1 text-xs px-2 py-0.5 shadow-sm">
+//                                         <Star className="h-3 w-3 text-white" />
+//                                         Featured
+//                                     </Badge>
+//                                 </div>
+//                             )}
+
+//                             <CardHeader className="p-0">
+//                                 <div className="aspect-video overflow-hidden rounded-t-md bg-muted">
+//                                     <img
+//                                         src={
+//                                             course.image_url
+//                                                 ? course.image_url
+//                                                 : 'https://i.ytimg.com/vi/p0iWbtHPel4/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLAr8RkZINpmZyn-m1gZbZZLwiDHhg'
+//                                         }
+//                                         alt={course.title}
+//                                         className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+//                                     />
+//                                 </div>
+//                             </CardHeader>
+
+//                             <CardContent className="flex-grow p-5 flex flex-col">
+//                                 <div className="flex justify-between items-center mb-3">
+//                                     <Badge variant="outline">{course.category.name}</Badge>
+//                                     <Badge
+//                                         variant={
+//                                             course.level === 'beginner'
+//                                                 ? 'success'
+//                                                 : course.level === 'intermediate'
+//                                                     ? 'secondary'
+//                                                     : 'destructive'
+//                                         }
+//                                     >
+//                                         {course.level}
+//                                     </Badge>
+//                                 </div>
+
+//                                 <CardTitle className="text-lg font-semibold mb-2 line-clamp-2">
+//                                     {course.title}
+//                                 </CardTitle>
+
+//                                 {/* Meta Info Row */}
+//                                 <div className="flex flex-col gap-2 text-sm text-muted-foreground mb-4">
+//                                     <div className="flex items-center gap-2">
+//                                         <Layers className="h-4 w-4" />
+//                                         <span>{course.modules.length} Modules</span>
+//                                     </div>
+//                                     <div className="flex items-center gap-2">
+//                                         <MessageSquare className="h-4 w-4" />
+//                                         <span>{course.reviews.length} Reviews</span>
+//                                     </div>
+//                                     <div className="flex items-center gap-2">
+//                                         <Clock className="h-4 w-4" />
+//                                         <span>{course.duration}</span>
+//                                     </div>
+//                                 </div>
+
+//                                 <div className="mt-auto flex justify-between items-center text-sm">
+//                                     {course.is_paid ? (
+//                                         <span className="font-semibold text-primary">${course.price}</span>
+//                                     ) : (
+//                                         <Badge variant="success">Free</Badge>
+//                                     )}
+//                                 </div>
+//                             </CardContent>
+
+//                             <CardFooter className="px-5 pb-5 pt-0">
+//                                 <Button asChild className="w-full">
+//                                     <Link href={`/courses/${course.id}`}>View Details</Link>
+//                                 </Button>
+//                             </CardFooter>
+//                         </Card>
+//                     ))}
+//                 </div>
+//             </div>
+//         </AppLayout>
+//     )
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
