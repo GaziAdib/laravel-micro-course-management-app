@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,6 +12,9 @@ class UserCourseController extends Controller
 
     public function index(Request $request)
     {
+
+        $categories = Category::all();
+
 
         $courses = Course::with(['modules', 'category', 'reviews'])
             ->when($request->search, function ($query, $search) {
@@ -26,11 +30,17 @@ class UserCourseController extends Controller
                     default => $query->latest(),
                 };
             })
+            ->when($request->category, function($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('category_id', 'like', "%{$search}%");
+                });
+            })
             ->paginate(12);
 
         return Inertia::render('user/Courses/Index', [
             'courses' => $courses,
-            'filters' => $request->only(['search', 'sort'])
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'sort', 'category'])
         ]);
     }
 

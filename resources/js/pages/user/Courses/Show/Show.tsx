@@ -76,7 +76,7 @@ export default function CourseDetailPage({ course }) {
                                 />
                             </div>
 
-                            <div className="p-2 md:p-6 lg:p-6">
+                            <div className="p-4 md:p-6 lg:p-6">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Badge variant="secondary">
                                         {course.category.name}

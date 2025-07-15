@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Clock, Layers, MessageSquare, Search, ArrowDown, Star } from 'lucide-react';
+import { Clock, Layers, MessageSquare, Search, ArrowDown, Star, Filter } from 'lucide-react';
 import {
     Card,
     CardHeader,
@@ -37,6 +37,11 @@ interface Course {
     reviews?: Array<{ id: number }>;
 }
 
+interface Category {
+    id: number;
+    name: string;
+}
+
 interface PaginatedResults<T> {
     data: T[];
     links: {
@@ -58,8 +63,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CoursesPage() {
-    const { courses, filters } = usePage<{
+    const { courses, filters, categories } = usePage<{
         courses: PaginatedResults<Course>;
+        categories: Category[];
         filters: { search?: string; sort?: string };
     }>().props;
 
@@ -67,7 +73,7 @@ export default function CoursesPage() {
     const debouncedSearch = useDebouncedCallback((value: string) => {
         router.get(
             route('user.courses.index'),
-            { search: value },
+            { ...filters, search: value },
             { preserveState: true, replace: true }
         );
     }, 500);
@@ -106,7 +112,7 @@ export default function CoursesPage() {
                             value={filters.sort || 'default'}
                             onValueChange={(sort) => router.get(
                                 route('user.courses.index'),
-                                { sort: sort !== 'default' ? sort : undefined },
+                                { ...filters, sort: sort !== 'default' ? sort : undefined },
                                 { preserveState: true }
                             )}
                         >
@@ -121,7 +127,44 @@ export default function CoursesPage() {
                             </SelectContent>
                         </Select>
                     </div>
+                    <div className="w-full sm:w-48">
+                        <Select
+                            value={filters.category || 'all'}
+                            onValueChange={(selectedCategoryId) => router.get(
+                                route('user.courses.index'),
+                                {
+                                    ...filters,
+                                    category: selectedCategoryId !== 'all' ? selectedCategoryId : undefined,
+                                    page: undefined
+                                },
+                                { preserveState: true }
+                            )}
+                        >
+                            <SelectTrigger className="w-full">
+                                <Filter className="mr-2 h-4 w-4" />
+                                <SelectValue>
+                                    {filters.category
+                                        ? categories?.find(c => c.id.toString() === filters.category)?.name
+                                        : "Filter by category"}
+                                </SelectValue>
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="all">All Categories</SelectItem>
+                                {categories?.map((category) => (
+                                    <SelectItem
+                                        key={category.id}
+                                        value={category.id.toString()}
+                                    >
+                                        {category.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
+
+
 
                 {/* Courses Grid */}
                 {courses.data.length > 0 ? (
@@ -153,8 +196,8 @@ export default function CoursesPage() {
                                         <Badge
                                             variant={
                                                 course.level === 'beginner' ? 'success' :
-                                                course.level === 'intermediate' ? 'secondary' :
-                                                'destructive'
+                                                    course.level === 'intermediate' ? 'secondary' :
+                                                        'destructive'
                                             }
                                         >
                                             {course.level}
