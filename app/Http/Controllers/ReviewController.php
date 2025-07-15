@@ -2,63 +2,87 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\Review;
+use App\Services\ReviewService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ReviewController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    protected ReviewService $reviewService;
+
+    public function __construct(ReviewService $reviewService)
     {
-        //
+        $this->reviewService = $reviewService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // public function index()
+    // {
+    //     $reviews = $this->reviewService->paginateAllReviews(10);
+
+    //     return Inertia::render('admin/categories', ['reviews' => $reviews]);
+    // }
+
+    public function showReviews($courseId)
     {
-        //
+        $reviews = $this->reviewService->paginateUserReviews(5, $courseId);
+        dd($reviews);
+        return Inertia::render('user/Courses/Show/Show', ['reviews' => $reviews]);
+        //return Inertia::render('user/Courses/Show/Show', ['reviews' => $reviews]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+
+
+    public function create() {}
+
+
+    public function store(Request $request, Course $course)
     {
-        //
+        $validated = $request->validate([
+            'content' => 'required|string|max:500',
+            'rating' => 'required|integer|min:1|max:5',
+            'is_approved' => 'sometimes|boolean'
+        ]);
+
+
+        $this->reviewService->addReview($course->id, $validated);
+
+        return redirect()->route('user.courses.show', $course->id)
+            ->with('success', 'Review Added Successfully');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+
+    public function update(Request $request, Course $course, Review $review)
     {
-        //
+        $validated = $request->validate([
+            'content' => 'required|string|max:500',
+            'rating' => 'required|integer|min:1|max:5',
+            'is_approved' => 'sometimes|boolean',
+
+        ]);
+
+
+        $this->reviewService->updateReview($course->id, $review->id,  $validated);
+
+        return redirect()->route('admin.reviews.index')
+            ->with('success', 'Review Updated Successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+
+    public function destroy(Course $course, Review $review)
     {
-        //
+        $this->reviewService->deleteReview($review->id, $course->id);
+
+        return redirect()->route('admin.categories.index')
+            ->with('success', 'Module Deleted Successfully');
     }
 }

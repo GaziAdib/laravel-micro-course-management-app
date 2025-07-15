@@ -4,6 +4,8 @@ import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ModuleLists from '@/components/listings/ModuleLists';
+import CourseReviewForm from  '@/components/forms/CourseReviewForm';
+import ReviewListings from  '@/components/listings/ReviewListings';
 
 
 
@@ -11,8 +13,8 @@ export default function CourseDetailPage({ course }) {
 
     const breadcrumbs = [
     {
-        title: `Courses / ${course.title} / Detail`,
-        href: `/user/courses/${course.id}`,
+        title: `Courses / ${course?.title} / Detail`,
+        href: `/user/courses/${course?.id}`,
     },
 ];
     return (
@@ -58,22 +60,31 @@ export default function CourseDetailPage({ course }) {
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="flex items-center text-sm text-muted-foreground">
                                         <Users className="mr-2 h-4 w-4" />
-                                        {course.modules.length} modules
+                                        {course?.modules?.length} modules
                                     </div>
                                     <div className="flex items-center text-sm text-muted-foreground">
                                         <Star className="mr-2 h-4 w-4" />
                                         {/* {course.average_rating} ({course.reviews_count} reviews) */}
-                                        5 ratings
+                                        {course?.reviews?.length} ratings
                                     </div>
                                 </div>
 
-                                <div className="prose max-w-none mb-8">
+                                <div className="prose max-w-none mb-8 text-justify">
                                     {course.description}
                                 </div>
 
                                 <h2 className="text-xl font-semibold mb-4">Course Modules ({course?.modules?.length})</h2>
 
                                 <ModuleLists modules={course.modules} />
+
+                                <div className='my-4 py-4'>
+                                    <ReviewListings reviews={course?.reviews}  />
+                                </div>
+
+                                <div className="prose my-4 py-4 max-w-none mb-8 text-justify">
+                                    <h2 className="text-xl font-semibold mb-4">Course Reviews ({course?.reviews?.length})</h2>
+                                    <CourseReviewForm course={course} />
+                                </div>
                             </div>
                         </div>
                     </div>

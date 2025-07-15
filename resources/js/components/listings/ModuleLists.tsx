@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Clock, ChevronDown, ChevronRight, CheckCircle2, PlayCircle } from 'lucide-react';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 
 interface Lesson {

@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserCourseController;
 
 Route::get('/', function () {
@@ -44,6 +45,15 @@ Route::middleware(['auth'])->prefix('user')->group(function() {
     Route::get('/courses', [UserCourseController::class, 'index'])->name('user.courses.index');
     Route::get('/courses/{course}', [UserCourseController::class, 'show'])->name('user.courses.show');
 });
+
+
+Route::middleware(['auth'])->prefix('user')->group(function() {
+    Route::get('/courses/{course}/reviews', [ReviewController::class, 'showReviews'])->name('user.reviews.show');
+    Route::post('/courses/{course}/review/add', [ReviewController::class, 'store'])->name('user.reviews.store');
+    Route::put('/courses/{course}/review/{review}', [ReviewController::class, 'update'])->name('user.reviews.update');
+    Route::delete('/courses/{course}/review/{review}', [ReviewController::class, 'destroy'])->name('user.reviews.destroy');
+});
+
 
 
 require __DIR__ . '/settings.php';
