@@ -42,8 +42,8 @@ const ReviewListings = ({ reviews }) => {
           <p className="text-muted-foreground">No reviews yet. Be the first to review!</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {reviews.map((review) => (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-3">
+          {reviews?.map((review) => (
             <Card key={review.id} className="h-full transition-all hover:shadow-md">
               <CardHeader className="flex flex-row items-center space-x-3 space-y-0 pb-2">
                 <Avatar className="h-10 w-10">

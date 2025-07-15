@@ -27,11 +27,12 @@ class ReviewController extends Controller
 
     public function showReviews($courseId)
     {
-        $reviews = $this->reviewService->paginateUserReviews(5, $courseId);
-        dd($reviews);
+        $reviews = $this->reviewService->paginateUserReviews(10, $courseId);
         return Inertia::render('user/Courses/Show/Show', ['reviews' => $reviews]);
         //return Inertia::render('user/Courses/Show/Show', ['reviews' => $reviews]);
     }
+
+
 
 
 

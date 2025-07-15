@@ -17,10 +17,20 @@ class ReviewService
 
     public function paginateUserReviews(int $perPage, $courseId): Paginator
     {
-        return Review::with('course')
+
+
+        return Review::with(['user:id,name,email', 'course:id,title'])
             ->where('course_id', $courseId)
+            ->where('is_approved', true)
             ->latest()
             ->paginate($perPage);
+
+        // return Review::with('course')
+        //     ->where('course_id', $courseId)
+        //     ->latest()
+        //     ->paginate($perPage);
+
+
     }
 
 
