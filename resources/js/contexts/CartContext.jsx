@@ -33,7 +33,8 @@ export const CartProvider = ({ children, initialCart = [] }) => {
             return [...prev, {
                 course: {
                     ...course,
-                    price: course.is_paid === false ? Number(course.price): 0
+                    price: Number(course.price) || 0
+                   // price: course.is_paid === false ? Number(course.price) : 0
                 },
                 quantity: 1
             }];

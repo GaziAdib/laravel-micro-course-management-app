@@ -5,7 +5,7 @@ const AddToCartButton = ({ course }) => {
 
     const { cart, addToCart } = useCart();
 
-    const isInCart = cart.some(item => item.id === course.id);
+    const isInCart = cart.some(item => item.course.id === course.id);
 
     return (
         <div>
