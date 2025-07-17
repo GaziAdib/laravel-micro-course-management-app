@@ -20,7 +20,10 @@ class UserCourseController extends Controller
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhereHas('modules', function ($moduleQuery) use ($search) {
+                            $moduleQuery->where('title', 'like', "%{$search}%");
+                        });
                 });
             })
             ->when($request->sort, function ($query, $sort) {
@@ -30,7 +33,7 @@ class UserCourseController extends Controller
                     default => $query->latest(),
                 };
             })
-            ->when($request->category, function($query, $search) {
+            ->when($request->category, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('category_id', 'like', "%{$search}%");
                 });
@@ -43,6 +46,15 @@ class UserCourseController extends Controller
             'filters' => $request->only(['search', 'sort', 'category'])
         ]);
     }
+
+
+    public function showCarts(Request $request)
+    {
+        // Make sure this path matches exactly with your file structure
+        return Inertia::render('user/Carts/Index'); // lowercase 'user' if your folder is lowercase
+    }
+
+    // user show theirs carts course data
 
 
     public function show($courseId)

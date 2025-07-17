@@ -54,6 +54,13 @@ Route::middleware(['auth'])->prefix('user')->group(function() {
     Route::delete('/courses/{course}/review/{review}', [ReviewController::class, 'destroy'])->name('user.reviews.destroy');
 });
 
+Route::middleware(['auth'])->prefix('user')->group(function() {
+  Route::get('/carts', [UserCourseController::class, 'showCarts'])->name('carts.index');
+});
+
+
+
+
 
 
 require __DIR__ . '/settings.php';

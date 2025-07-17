@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import ModuleLists from '@/components/listings/ModuleLists';
 import CourseReviewForm from '@/components/forms/CourseReviewForm';
 import ReviewListings from '@/components/listings/ReviewListings';
-
+import AddToCartButton from '@/components/carts/AddToCartButton';
 
 export default function CourseDetailPage({ course }) {
 
@@ -88,9 +88,12 @@ export default function CourseDetailPage({ course }) {
                                     }>
                                         {course.level}
                                     </Badge>
+                                    <AddToCartButton course={course} />
                                 </div>
 
                                 <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
+
+
 
                                 <div className="flex items-center md:justify-start lg:justify-start justify-around gap-8 lg:gap-4 md:gap-6 mb-6">
                                     <div className="flex items-center text-sm text-muted-foreground">

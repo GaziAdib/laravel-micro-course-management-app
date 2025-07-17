@@ -63,6 +63,12 @@ export function AppSidebar() {
         href: '/user/courses',
         icon: BookOpen,
     },
+
+    {
+        title: 'Carts',
+        href: '/user/carts',
+        icon: BookOpen,
+    },
 ]: [];
 
 

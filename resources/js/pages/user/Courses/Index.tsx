@@ -117,7 +117,7 @@ export default function CoursesPage() {
                             )}
                         >
                             <SelectTrigger className="w-full">
-                                <ArrowDown className="mr-2 h-4 w-4" />
+                                <Filter className="mr-2 h-4 w-4" />
                                 <SelectValue placeholder="Sort by" />
                             </SelectTrigger>
                             <SelectContent>
