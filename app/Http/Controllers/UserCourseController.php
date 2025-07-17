@@ -54,7 +54,13 @@ class UserCourseController extends Controller
         return Inertia::render('user/Carts/Index'); // lowercase 'user' if your folder is lowercase
     }
 
-    // user show theirs carts course data
+    public function showCheckouts(Request $request)
+    {
+        // Make sure this path matches exactly with your file structure
+        return Inertia::render('user/Checkouts/Index'); // lowercase 'user' if your folder is lowercase
+    }
+
+
 
 
     public function show($courseId)

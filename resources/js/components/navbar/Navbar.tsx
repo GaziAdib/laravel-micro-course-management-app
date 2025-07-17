@@ -1,13 +1,27 @@
 import { useCart } from '@/contexts/CartContext';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-export default function Navbar() {
+// Define props interface
+interface NavbarProps {
+    auth: {
+        user: {
+            email: string;
+            name: string;
+        } | null;
+    };
+}
+
+
+export default function Navbar({ auth}: NavbarProps) {
+
     const { cartCount } = useCart();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const user = auth?.user;
+
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

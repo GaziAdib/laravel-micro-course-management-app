@@ -1,6 +1,6 @@
 import '../css/app.css';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, usePage } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
@@ -19,7 +19,6 @@ createInertiaApp({
 
         root.render(
             <CartProvider initialCart={[]}>
-
                 <Navbar />
                 <Toaster position="top-right" richColors closeButton />
                 <App {...props} />
