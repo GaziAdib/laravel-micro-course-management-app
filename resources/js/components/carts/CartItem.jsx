@@ -6,26 +6,26 @@ import { X } from 'lucide-react'
 const  CartItem = ({ item, onRemove, onQuantityChange }) => {
   return (
     <Card className="hover:shadow-md transition-shadow">
-      <div className="flex flex-col sm:flex-row">
+      <div className="flex flex-col px-4 lg:px-1 md:px-2 sm:flex-row">
         {/* Course Image */}
         <div className="sm:w-1/3">
           <img
             src={item.course.image_url || '/placeholder-course.jpg'}
             alt={item.course.title}
-            className="w-full h-full object-cover rounded-l-lg"
+            className="w-full h-full object-cover  rounded-l-lg "
             style={{ minHeight: '200px' }}
           />
         </div>
 
         {/* Course Details */}
-        <div className="sm:w-2/3 p-6 flex flex-col">
+        <div className="sm:w-2/3 p-6 ml-2 flex flex-col">
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-xl font-bold">{item.course.title}</h2>
               <p className="text-sm text-muted-foreground mb-2 mx-1 py-1">
                 {item.course.category?.name || 'No Category'}
               </p>
-              <p className="text-sm rounded-2xl inline-block px-2 bg-gray-900 mx-auto line-clamp-2 mb-4">
+              <p className="text-sm rounded-2xl inline-block px-2 dark:bg-gray-900 mx-auto line-clamp-2 mb-4">
                  {item.course.level}
               </p>
             </div>
