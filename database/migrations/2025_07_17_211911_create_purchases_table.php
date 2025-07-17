@@ -16,8 +16,7 @@ return new class extends Migration
 
             // User and Course relationships
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
-
+            $table->json('courses'); // Stores array of course data
             // Payment status
             $table->enum('status', [
                 'pending',
@@ -58,11 +57,7 @@ return new class extends Migration
             // Timestamps
             $table->timestamp('purchased_at')->useCurrent();
             $table->timestamps();
-
-            // Indexes
-            $table->index(['user_id', 'course_id']);
-            $table->index('transaction_id');
-            $table->index('status');
+            $table->index('user_id'); // For faster user-specific queries
         });
     }
 

@@ -32,8 +32,8 @@ class Purchase extends Model
 
         // Foreign keys
         'user_id',
-        'course_id',
-        'coupon_id'
+        'courses',
+        // 'coupon_id'
     ];
 
 
@@ -42,6 +42,7 @@ class Purchase extends Model
         'amount'           => 'decimal:2', // Ensures 2 decimal places
         'discount_amount'  => 'decimal:2',
         'final_amount'     => 'decimal:2',
+        'courses' => 'array',
         'applicable_courses' => 'array',   // If storing JSON (e.g., for coupons)
         'is_active'        => 'boolean',   // If you have status flags
     ];

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePurchaseRequest;
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\Purchase;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class UserCourseController extends Controller
@@ -59,6 +63,29 @@ class UserCourseController extends Controller
         // Make sure this path matches exactly with your file structure
         return Inertia::render('user/Checkouts/Index'); // lowercase 'user' if your folder is lowercase
     }
+
+    public function purchaseCourse(StorePurchaseRequest $request)
+    {
+        // Make sure this path matches exactly with your file structure
+
+
+        Purchase::create([
+            'user_id' =>  Auth::user()->id,
+            'payment_gateway' => $request->payment_gateway,
+            'customer_mobile' => $request->customer_mobile,
+            'customer_email' => $request->customer_email,
+            'customer_address' => $request->customer_address,
+            'amount_paid' => $request->amount_paid,
+            'bkash_trxId' => $request->bkash_trxId,
+            'courses' => $request->courses,
+            'status' => 'pending',
+            'purchased_at' => now(),
+        ]);
+
+        return redirect()->route('user.courses.index')
+            ->with('success', 'Course Purchases Successfully');
+    }
+
 
 
 

@@ -45,9 +45,21 @@ class StorePurchaseRequest extends FormRequest
                 'string',
                 'min:6',
             ],
+            'courses' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'courses.*' => [
+                'integer', // or 'integer' if you're using course IDs
+            ],
+
+
+
         ];
     }
-     public function messages()
+    public function messages()
     {
         return [
             'customer_mobile.regex' => 'Invalid Bangladeshi mobile format (e.g., 01712345678)',

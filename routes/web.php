@@ -57,6 +57,7 @@ Route::middleware(['auth'])->prefix('user')->group(function() {
 Route::middleware(['auth'])->prefix('user')->group(function() {
   Route::get('/carts', [UserCourseController::class, 'showCarts'])->name('carts.index');
   Route::get('/checkouts', [UserCourseController::class, 'showCheckouts'])->name('checkouts.index');
+  Route::post('/checkouts/store', [UserCourseController::class, 'purchaseCourse'])->name('checkout.store');
 });
 
 
