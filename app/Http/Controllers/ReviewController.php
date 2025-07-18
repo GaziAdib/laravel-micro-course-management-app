@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Review;
 use App\Services\ReviewService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Inertia\Inertia;
 
 class ReviewController extends Controller
@@ -25,15 +26,14 @@ class ReviewController extends Controller
     //     return Inertia::render('admin/categories', ['reviews' => $reviews]);
     // }
 
-    public function showReviews($courseId)
+    public function showReviews(Request $request, $courseId)
     {
+        if (!$request->user()->can('viewAny', Review::class)) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
         $reviews = $this->reviewService->paginateUserReviews(10, $courseId);
         return Inertia::render('user/Courses/Show/Show', ['reviews' => $reviews]);
-        //return Inertia::render('user/Courses/Show/Show', ['reviews' => $reviews]);
     }
-
-
-
 
 
     public function create() {}
@@ -41,6 +41,11 @@ class ReviewController extends Controller
 
     public function store(Request $request, Course $course)
     {
+
+        if (!$request->user()->can('create', Review::class)) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
+
         $validated = $request->validate([
             'content' => 'required|string|max:500',
             'rating' => 'required|integer|min:1|max:5',
@@ -64,6 +69,11 @@ class ReviewController extends Controller
 
     public function update(Request $request, Course $course, Review $review)
     {
+
+        if (!$request->user()->can('update', Review::class)) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
+
         $validated = $request->validate([
             'content' => 'required|string|max:500',
             'rating' => 'required|integer|min:1|max:5',
@@ -79,8 +89,12 @@ class ReviewController extends Controller
     }
 
 
-    public function destroy(Course $course, Review $review)
+    public function destroy(Request $request, Course $course, Review $review)
     {
+        if (!$request->user()->can('delete', Review::class)) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
+
         $this->reviewService->deleteReview($review->id, $course->id);
 
         return redirect()->route('admin.categories.index')
