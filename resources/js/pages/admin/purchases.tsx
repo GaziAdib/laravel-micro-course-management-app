@@ -74,17 +74,10 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
         status: '',
     });
 
-    const handleAdd = () => {
-        setEditStatus(null);
-        setFormData({ status: '' });
-        setShowModal(true);
-    };
 
 
     const handleStatusChange = (value) => {
         setFormData({ ...formData, status: value })
-
-        console.log(formData)
     }
 
 
@@ -157,9 +150,7 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
             <div className="flex flex-col gap-4 p-4">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold">Purchases</h1>
-                    <Button onClick={handleAdd}>
-                        Add Purchases
-                    </Button>
+
                 </div>
 
 
@@ -169,6 +160,8 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                             <TableRow>
                                 <TableHead>ID</TableHead>
                                 <TableHead>Payment gateway</TableHead>
+                                <TableHead>Bkash TrxId</TableHead>
+                                 <TableHead>Bank Receipt No</TableHead>
                                 <TableHead>Amount Paid</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Customer Name</TableHead>
@@ -183,6 +176,8 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                 <TableRow key={purchase.id}>
                                     <TableCell>{purchase.id}</TableCell>
                                     <TableCell>{purchase.payment_gateway}</TableCell>
+                                    <TableHead>{purchase.bkash_trxId ? purchase.bkash_trxId : 'N/A'}</TableHead>
+                                    <TableHead>{purchase.bank_receipt_no ? purchase.bank_receipt_no : 'N/A'}</TableHead>
                                     <TableCell>{purchase.amount_paid}</TableCell>
                                     <TableCell>{purchase.status}</TableCell>
                                     <TableCell>{purchase.user.name}</TableCell>

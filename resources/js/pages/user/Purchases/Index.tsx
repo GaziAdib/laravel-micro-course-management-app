@@ -74,12 +74,6 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
         status: '',
     });
 
-    const handleAdd = () => {
-        setEditStatus(null);
-        setFormData({ status: '' });
-        setShowModal(true);
-    };
-
 
     const handleStatusChange = (value) => {
         setFormData({ ...formData, status: value })
@@ -134,13 +128,6 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
         }
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
 
     const handlePageChange = (page: number) => {
         router.get(route('admin.purchases.index'), { page }, {
@@ -157,9 +144,7 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
             <div className="flex flex-col gap-4 p-4">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold">Purchases</h1>
-                    <Button onClick={handleAdd}>
-                        Add Purchases
-                    </Button>
+
                 </div>
 
 

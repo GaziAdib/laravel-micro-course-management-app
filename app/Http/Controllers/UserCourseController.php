@@ -68,7 +68,6 @@ class UserCourseController extends Controller
     {
         // Make sure this path matches exactly with your file structure
 
-
         Purchase::create([
             'user_id' =>  Auth::user()->id,
             'payment_gateway' => $request->payment_gateway,
@@ -76,7 +75,9 @@ class UserCourseController extends Controller
             'customer_email' => $request->customer_email,
             'customer_address' => $request->customer_address,
             'amount_paid' => $request->amount_paid,
+            'bank_receipt_no' => $request->bank_receipt_no,
             'bkash_trxId' => $request->bkash_trxId,
+            'transaction_id' => $request->transaction_id,
             'courses' => $request->courses,
             'status' => 'pending',
             'purchased_at' => now(),
