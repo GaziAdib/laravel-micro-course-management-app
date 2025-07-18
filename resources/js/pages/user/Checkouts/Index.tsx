@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import { useEffect } from "react"
 
 export default function CheckoutPage() {
-    const { cart, cartTotal } = useCart();
+    const { cart, cartTotal, clearCart } = useCart();
     const { auth } = usePage().props;
     const user = auth.user;
 
@@ -43,7 +43,10 @@ export default function CheckoutPage() {
         }
 
         post(route('checkout.store'), {
-            onSuccess: () => toast.success("Order placed successfully!"),
+           onSuccess: () => {
+            toast.success("Order placed successfully!");
+            clearCart();
+        },
             onError: () => toast.error("Please check your form for errors")
         });
     };

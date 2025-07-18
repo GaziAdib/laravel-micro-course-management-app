@@ -57,6 +57,11 @@ export function AppSidebar() {
         href: '/admin/lessons',
         icon: FolderPlus,
     },
+    {
+        title: 'Purchases',
+        href: '/admin/purchases',
+        icon: FolderPlus,
+    },
 ]: user?.role === 'user' ? [
     {
         title: 'Courses',
@@ -68,6 +73,12 @@ export function AppSidebar() {
         title: 'Carts',
         href: '/user/carts',
         icon: BookOpen,
+    },
+
+    {
+        title: 'Purchases',
+        href: '/user/purchases',
+        icon: FolderPlus,
     },
 ]: [];
 

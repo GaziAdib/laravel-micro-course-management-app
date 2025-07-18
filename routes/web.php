@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserCourseController;
 
@@ -60,6 +61,18 @@ Route::middleware(['auth'])->prefix('user')->group(function() {
   Route::post('/checkouts/store', [UserCourseController::class, 'purchaseCourse'])->name('checkout.store');
 });
 
+Route::middleware(['auth'])->prefix('admin')->group(function() {
+  Route::get('/purchases', [PurchaseController::class, 'adminShowAllPurchases'])->name('admin.purchases.index');
+  Route::put('/purchases/{purchase}/update', [PurchaseController::class, 'changeStatus'])->name('admin.purchases.update');
+  Route::delete('/purchases/{purchase}/delete', [PurchaseController::class, 'destroyPurchase'])->name('admin.purchases.destroy');
+});
+
+
+
+
+Route::middleware(['auth'])->prefix('user')->group(function() {
+  Route::get('/purchases', [PurchaseController::class, 'showUserPurchases'])->name('user.purchases.index');
+});
 
 
 
