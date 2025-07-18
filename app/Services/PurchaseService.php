@@ -23,10 +23,9 @@ class PurchaseService
     // }
 
 
-    public function paginateUserPurchases(int $perPage, string $status = 'completed'): LengthAwarePaginator
+    public function paginateUserPurchases(int $perPage): LengthAwarePaginator
     {
         $purchases = Purchase::with(['user:id,name,email'])
-            ->where('status', $status)
             ->where('user_id', Auth::id())
             ->latest()
             ->paginate($perPage);

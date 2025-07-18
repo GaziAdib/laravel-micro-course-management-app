@@ -12,6 +12,7 @@ class PurchaseController extends Controller
 {
 
     protected PurchaseService $purchaseService;
+
     public function __construct(PurchaseService $purchaseService)
     {
         $this->purchaseService = $purchaseService;
@@ -24,9 +25,14 @@ class PurchaseController extends Controller
             abort(Response::HTTP_FORBIDDEN);
         }
 
-        $purchases = $this->purchaseService->paginateUserPurchases(10, 'completed');
+        $purchases = $this->purchaseService->paginateUserPurchases(10);
 
         return Inertia::render('user/Purchases/Index', ['purchases' => $purchases]);
+
+        // if (!$request->user()->purchases()->exists()) {
+        //     return redirect()->route('user.courses.index')
+        //         ->with('success', 'You haven\'t purchased any courses yet');
+        // }
     }
 
     public function adminShowAllPurchases(Request $request)

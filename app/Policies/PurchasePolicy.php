@@ -20,9 +20,9 @@ class PurchasePolicy
         return null;
     }
 
-     public function viewAny(User $user, Purchase $purchase): bool
+     public function viewAny(User $user): bool
     {
-        return $user->id === $purchase->user_id || $user->role === 'admin' || $user->role === 'admin';
+        return  $user->role === 'admin' || $user->role === 'moderator';
     }
 
     public function view(User $user): bool
@@ -44,12 +44,12 @@ class PurchasePolicy
         return $user->role === 'admin';
     }
 
-    public function restore(User $user, Purchase $purchase): bool
+    public function restore(User $user): bool
     {
         return false;
     }
 
-    public function forceDelete(User $user, Purchase $purchase): bool
+    public function forceDelete(User $user): bool
     {
         return $user->role === 'admin';
     }

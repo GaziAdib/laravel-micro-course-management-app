@@ -19,7 +19,6 @@ import {
     DialogFooter,
     DialogDescription,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -205,13 +204,13 @@ export default function PurchasesPage({ purchases, can }: PurchasesPageProps) {
                                                 </Button>}
 
 
-                                            <Button
+                                            {can.delete && <Button
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={() => handleDelete(purchase.id)}
                                             >
                                                 Delete
-                                            </Button>
+                                            </Button>}
 
 
                                         </div>
