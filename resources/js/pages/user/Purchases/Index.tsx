@@ -188,13 +188,13 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                             >
                                                 Edit
                                             </Button>
-                                            <Button
+                                            {/* <Button
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={() => handleDelete(purchase.id)}
                                             >
                                                 Delete
-                                            </Button>
+                                            </Button> */}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -258,10 +258,10 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>
-                                {editStatus ? 'Edit Category' : 'Add Category'}
+                                {editStatus ? 'Edit Status' : 'Add Status'}
                             </DialogTitle>
                             <DialogDescription>
-                                {editStatus ? 'Make changes to your category here.' : 'Create a new category here.'}
+                                {editStatus ? 'Make changes to your status here.' : 'Create a new status here.'}
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="space-y-4">

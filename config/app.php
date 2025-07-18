@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Auth\AuthServiceProvider;
+
 return [
 
     /*

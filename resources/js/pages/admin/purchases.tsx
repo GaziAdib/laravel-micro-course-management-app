@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { router, Head } from '@inertiajs/react';
+import { router, Head, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from "@/components/ui/button";
@@ -29,18 +29,17 @@ interface Course {
     title: string;
 }
 
-
 interface Purchase {
     id: number;
     payment_gateway: string;
     amount_paid: number;
     status: string;
-    courses: Course[]
+    courses: Course[];
     user: {
         id: number;
         name: string;
         email: string
-    }
+    };
 }
 
 interface PaginatedData {
@@ -58,6 +57,7 @@ interface PaginatedData {
 
 interface PurchasesPageProps {
     purchases: PaginatedData;
+
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -67,7 +67,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function PurchasesPage({ purchases }: PurchasesPageProps) {
+export default function PurchasesPage({ purchases, can }: PurchasesPageProps) {
+
+
+
     const [showModal, setShowModal] = useState(false);
     const [editStatus, setEditStatus] = useState<Purchase | null>(null);
     const [formData, setFormData] = useState({
@@ -161,7 +164,7 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                 <TableHead>ID</TableHead>
                                 <TableHead>Payment gateway</TableHead>
                                 <TableHead>Bkash TrxId</TableHead>
-                                 <TableHead>Bank Receipt No</TableHead>
+                                <TableHead>Bank Receipt No</TableHead>
                                 <TableHead>Amount Paid</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Customer Name</TableHead>
@@ -191,13 +194,17 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleEdit(purchase)}
-                                            >
-                                                Edit
-                                            </Button>
+
+                                            {can.updateStatus &&
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleEdit(purchase)}
+                                                >
+                                                    Edit
+                                                </Button>}
+
+
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
@@ -205,6 +212,8 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                             >
                                                 Delete
                                             </Button>
+
+
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -268,10 +277,10 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>
-                                {editStatus ? 'Edit Category' : 'Add Category'}
+                                {editStatus ? 'Edit Purchases' : 'Add Purchases'}
                             </DialogTitle>
                             <DialogDescription>
-                                {editStatus ? 'Make changes to your category here.' : 'Create a new category here.'}
+                                {editStatus ? 'Make changes to your status here.' : 'Create a new purchase here.'}
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="space-y-4">
