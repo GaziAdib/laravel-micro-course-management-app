@@ -65,8 +65,15 @@ class ReviewService
     public function deleteReview(int $id, int $courseId): bool
     {
 
-        return Review::whereId($id)
-            ->whereCourseId($courseId)
+        return Review::where(function ($query) {
+            $query->where('user_id', Auth::id());
+
+            if (Auth::user()->role === 'admin') {
+                $query->orWhereRaw('1 = 1'); // always true, allows admin
+            }
+        })
+            ->where('id', $id)
+            ->where('course_id', $courseId)
             ->firstOrFail()
             ->delete();
     }

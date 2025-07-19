@@ -10,10 +10,7 @@ import AddToCartButton from '@/components/carts/AddToCartButton';
 
 export default function CourseDetailPage({ course }) {
 
-
     const { course: data } = usePage().props;
-
-    // console.log('reviews', data.reviews);
 
 
     const averageRating = data?.reviews?.length > 0

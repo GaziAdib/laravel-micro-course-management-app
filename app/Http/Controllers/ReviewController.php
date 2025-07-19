@@ -28,11 +28,16 @@ class ReviewController extends Controller
 
     public function showReviews(Request $request, $courseId)
     {
-        if (!$request->user()->can('viewAny', Review::class)) {
+        if (!$request->user()->can('view', Review::class)) {
             abort(Response::HTTP_FORBIDDEN);
         }
         $reviews = $this->reviewService->paginateUserReviews(10, $courseId);
-        return Inertia::render('user/Courses/Show/Show', ['reviews' => $reviews]);
+        return Inertia::render('user/Courses/Show/Show', [
+            'reviews' => $reviews,
+            'can' => [
+                'delete' => $request->user()->can('delete', Review::class),
+            ]
+        ]);
     }
 
 
@@ -91,13 +96,13 @@ class ReviewController extends Controller
 
     public function destroy(Request $request, Course $course, Review $review)
     {
-        if (!$request->user()->can('delete', Review::class)) {
+        if (!$request->user()->can('delete', $review)) {
             abort(Response::HTTP_FORBIDDEN);
         }
 
         $this->reviewService->deleteReview($review->id, $course->id);
 
-        return redirect()->route('admin.categories.index')
+        return redirect()->route('user.courses.show', $review->course_id)
             ->with('success', 'Module Deleted Successfully');
     }
 }
