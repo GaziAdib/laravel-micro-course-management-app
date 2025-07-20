@@ -42,36 +42,41 @@ Route::put('/admin/{module}/lesson/{lesson}', [LessonController::class, 'update'
 Route::delete('/admin/{module}/lesson/{lesson}', [LessonController::class, 'destroy'])->name('admin.lessons.destroy');
 
 
-Route::middleware(['auth'])->prefix('user')->group(function() {
+Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::get('/courses', [UserCourseController::class, 'index'])->name('user.courses.index');
     Route::get('/courses/{course}', [UserCourseController::class, 'show'])->name('user.courses.show');
 });
 
 
-Route::middleware(['auth'])->prefix('user')->group(function() {
+Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::get('/courses/{course}/reviews', [ReviewController::class, 'showReviews'])->name('user.reviews.show');
     Route::post('/courses/{course}/review/add', [ReviewController::class, 'store'])->name('user.reviews.store');
     Route::put('/courses/{course}/review/{review}', [ReviewController::class, 'update'])->name('user.reviews.update');
     Route::delete('/courses/{course}/review/{review}', [ReviewController::class, 'destroy'])->name('user.reviews.destroy');
 });
 
-Route::middleware(['auth'])->prefix('user')->group(function() {
-  Route::get('/carts', [UserCourseController::class, 'showCarts'])->name('carts.index');
-  Route::get('/checkouts', [UserCourseController::class, 'showCheckouts'])->name('checkouts.index');
-  Route::post('/checkouts/store', [UserCourseController::class, 'purchaseCourse'])->name('checkout.store');
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('/carts', [UserCourseController::class, 'showCarts'])->name('carts.index');
+    Route::get('/checkouts', [UserCourseController::class, 'showCheckouts'])->name('checkouts.index');
+    Route::post('/checkouts/store', [UserCourseController::class, 'purchaseCourse'])->name('checkout.store');
 });
 
-Route::middleware(['auth'])->prefix('admin')->group(function() {
-  Route::get('/purchases', [PurchaseController::class, 'adminShowAllPurchases'])->name('admin.purchases.index');
-  Route::put('/purchases/{purchase}/update', [PurchaseController::class, 'changeStatus'])->name('admin.purchases.update');
-  Route::delete('/purchases/{purchase}/delete', [PurchaseController::class, 'destroyPurchase'])->name('admin.purchases.destroy');
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/purchases', [PurchaseController::class, 'adminShowAllPurchases'])->name('admin.purchases.index');
+    Route::put('/purchases/{purchase}/update', [PurchaseController::class, 'changeStatus'])->name('admin.purchases.update');
+    Route::delete('/purchases/{purchase}/delete', [PurchaseController::class, 'destroyPurchase'])->name('admin.purchases.destroy');
 });
 
 
 
 
-Route::middleware(['auth'])->prefix('user')->group(function() {
-  Route::get('/purchases', [PurchaseController::class, 'showUserPurchases'])->name('user.purchases.index');
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('/purchases', [PurchaseController::class, 'showUserPurchases'])->name('user.purchases.index');
+});
+
+
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('/{course}/classroom', [UserCourseController::class, 'userCourseClassroom'])->name('user.course.classroom.index');
 });
 
 

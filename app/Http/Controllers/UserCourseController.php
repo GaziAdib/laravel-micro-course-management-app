@@ -15,6 +15,8 @@ use Inertia\Inertia;
 class UserCourseController extends Controller
 {
 
+
+
     public function index(Request $request)
     {
 
@@ -57,6 +59,39 @@ class UserCourseController extends Controller
     }
 
 
+    // user can view their classroom for purchased course
+    public function userCourseClassroom($courseId)
+    {
+
+        // new for purchase info so that courses ui shows you purchased it already in home user page
+        // $purchases = Purchase::with(['orderItems', 'user'])->where('user_id', Auth::id())->paginate(10);
+
+
+        $course = Course::with([
+            'category',
+            'modules' => function ($query) {
+                $query->orderBy('order', 'asc')
+                    ->with(['lessons' => function ($q) {
+                        $q->orderBy('order', 'asc');
+                    }]);
+            },
+            'reviews.user'
+        ])
+            ->findOrFail($courseId);
+
+
+
+        return Inertia::render('user/Classroom/Index', [
+            'course' => $course,
+            // 'purchases' => $purchases
+        ]);
+    }
+
+
+
+
+
+
     public function showCarts(Request $request)
     {
         // Make sure this path matches exactly with your file structure
@@ -73,7 +108,7 @@ class UserCourseController extends Controller
     {
         // Make sure this path matches exactly with your file structure
 
-       $purchase = Purchase::create([
+        $purchase = Purchase::create([
             'user_id' =>  Auth::user()->id,
             'payment_gateway' => $request->payment_gateway,
             'customer_mobile' => $request->customer_mobile,
