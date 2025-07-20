@@ -20,6 +20,9 @@ class UserCourseController extends Controller
 
         $categories = Category::all();
 
+        // new for purchase info so that courses ui shows you purchased it already in home user page
+        $purchases = Purchase::with(['orderItems', 'user'])->where('user_id', Auth::id())->paginate(10);
+
 
         $courses = Course::with(['modules', 'category', 'reviews'])
             ->when($request->search, function ($query, $search) {
@@ -47,6 +50,7 @@ class UserCourseController extends Controller
 
         return Inertia::render('user/Courses/Index', [
             'courses' => $courses,
+            'purchases' => $purchases,
             'categories' => $categories,
             'filters' => $request->only(['search', 'sort', 'category'])
         ]);

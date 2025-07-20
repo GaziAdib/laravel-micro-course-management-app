@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { Search,  Filter } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import CourseItem from '@/components/cards/CourseItem';
 
 import AppLayout from '@/layouts/app-layout';
@@ -55,12 +55,32 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+
+
 export default function CoursesPage() {
-    const { courses, filters, categories } = usePage<{
-        courses: PaginatedResults<Course>;
-        categories: Category[];
+    const { courses, filters, categories, purchases } = usePage<{
+        courses: PaginatedResults<Course>,
+        categories: Category[],
+        purchases,
         filters: { search?: string; sort?: string };
     }>().props;
+
+    console.log('courses', courses);
+
+    console.log('purchases', purchases);
+
+    // purchases->data->user->id
+
+    // Extract purchased course IDs
+    const purchasedCourseIds = purchases.data.flatMap((purchase) =>
+        purchase.order_items.map((item) => item.course_data.id)
+    );
+
+    console.log(purchasedCourseIds);
+
+    const isCoursePurchased = (courseId: number) => {
+        return purchasedCourseIds.includes(courseId);
+    };
 
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -163,7 +183,7 @@ export default function CoursesPage() {
                 {courses.data.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 w-full max-w-7xl">
                         {courses.data.map((course) => (
-                            <CourseItem key={course.id} course={course}/>
+                            <CourseItem key={course.id} course={course} isCoursePurchased={isCoursePurchased(course.id)} />
                         ))}
                     </div>
                 ) : (

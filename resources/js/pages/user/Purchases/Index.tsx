@@ -95,7 +95,18 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
         setShowModal(true);
     };
 
+    // get status wise bg color
 
+    const getStatusColor = (status) => {
+        switch (status.toLowerCase()) {
+            case 'completed':
+                return 'bg-green-800 text-green-50 border border-green-500 rounded-3xl';
+            case 'pending':
+                return 'bg-orange-800 text-orange-50 bg-red-800 text-red-50 border border-orange-500 rounded-3xl';
+            default:
+                return 'bg-red-800 text-red-50 border  border-red-500 rounded-3xl';
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -134,6 +145,7 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
 
 
 
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Purchases" />
@@ -167,7 +179,9 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                     <TableCell>{purchase.id}</TableCell>
                                     <TableCell>{purchase.payment_gateway}</TableCell>
                                     <TableCell>{purchase.amount_paid}</TableCell>
-                                    <TableCell>{purchase.status}</TableCell>
+                                    <TableCell className={`px-3 inline-block mt-2  ${getStatusColor(purchase.status)}`}>
+                                        {purchase.status}
+                                    </TableCell>
                                     <TableCell>{purchase.user.name}</TableCell>
                                     <TableCell>{purchase.user.email}</TableCell>
                                     <TableCell>
@@ -175,7 +189,7 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                             ?.map((orderItem) => (
                                                 <div key={orderItem.id}>
                                                     {orderItem.course_data.title},
-                                                    ({'$ '+orderItem.course_data.price}),
+                                                    ({'$ ' + orderItem.course_data.price}),
                                                 </div>
                                             ))}
                                     </TableCell>

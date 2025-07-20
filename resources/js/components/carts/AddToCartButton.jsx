@@ -1,12 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
+import { usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 
-const AddToCartButton = ({ course }) => {
+const AddToCartButton = ({ course, isCoursePurchased }) => {
 
     const { cart, addToCart } = useCart();
 
     const isInCart = cart.some(item => item.course.id === course.id);
+
 
     const handleAddToCart = (course) => {
         try {
@@ -26,10 +28,10 @@ const AddToCartButton = ({ course }) => {
         <div>
             <Button
                 onClick={() => handleAddToCart(course)}
-                disabled={isInCart}
+                disabled={isInCart || isCoursePurchased}
                 className='cursor-pointer'
             >
-                {isInCart ? 'In Cart' : 'Add to Cart'}
+               {isCoursePurchased ? 'Purchased' : isInCart ? 'In Cart' : 'Add to Cart'}
             </Button>
         </div>
     );

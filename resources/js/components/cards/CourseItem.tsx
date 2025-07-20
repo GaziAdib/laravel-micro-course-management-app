@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 
 import AddToCartButton from '@/components/carts/AddToCartButton';
 
-const CourseItem = ({ course }) => {
+const CourseItem = ({ course, isCoursePurchased }) => {
     return (
         <Card key={course.id} className="relative h-full flex flex-col hover:shadow-lg transition-all border border-border">
             {course.is_featured && (
@@ -91,9 +91,9 @@ const CourseItem = ({ course }) => {
                         </Link>
                     </Button>
 
-                    <AddToCartButton
-                        course={course}
-                    />
+                   <AddToCartButton  course={course} isCoursePurchased={isCoursePurchased}/>
+
+
                 </div>
             </CardFooter>
         </Card>
