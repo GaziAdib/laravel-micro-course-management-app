@@ -23,22 +23,30 @@ import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface Course {
+interface OrderItem {
     id: number;
-    title: string;
+    purchase_id: number;
+    course_data: {
+        id: number,
+        title: string,
+        price: number
+    };
+    total_price: number;
+    quantity?: number;
 }
+
 
 interface Purchase {
     id: number;
     payment_gateway: string;
     amount_paid: number;
     status: string;
-    courses: Course[];
+    order_items: OrderItem[]
     user: {
         id: number;
         name: string;
         email: string
-    };
+    }
 }
 
 interface PaginatedData {
@@ -56,7 +64,6 @@ interface PaginatedData {
 
 interface PurchasesPageProps {
     purchases: PaginatedData;
-
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -185,11 +192,13 @@ export default function PurchasesPage({ purchases, can }: PurchasesPageProps) {
                                     <TableCell>{purchase.user.name}</TableCell>
                                     <TableCell>{purchase.user.email}</TableCell>
                                     <TableCell>
-                                        {purchase.courses?.map((course) => (
-                                            <div key={course.id}>
-                                                {course.title},
-                                            </div>
-                                        ))}
+                                       {purchase?.order_items
+                                            ?.map((orderItem) => (
+                                                <div key={orderItem.id}>
+                                                    {orderItem.course_data.title},
+                                                    ({'$ '+orderItem.course_data.price}),
+                                                </div>
+                                            ))}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex gap-2">

@@ -13,8 +13,7 @@ return new class extends Migration
             $table->id();
 
             // User and Course relationships
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->json('courses'); // Stores array of course data
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             // Payment status
             $table->enum('status', [
                 'pending',

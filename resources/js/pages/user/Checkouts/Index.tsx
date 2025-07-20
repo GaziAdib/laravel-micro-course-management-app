@@ -22,8 +22,21 @@ export default function CheckoutPage() {
         bank_receipt_no: undefined,
         transaction_id: undefined,
         amount_paid: cartTotal,
-        courses: cart.map(item => item.course.id)
+        order_items: cart.map(item => ({
+            course_data: {  // This must match exactly what backend expects
+                id: item.course.id,
+                title: item.course.title,
+                price: item.course.price,
+                // Include ALL fields you need in the order item
+                image_url: item.course.image_url,
+                duration: item.course.duration
+            },
+            quantity: item.quantity || 1, // Ensure quantity exists, default to 1
+            coupon_code: item.coupon_code || null,
+            discount_amount: item.discount_amount || 0
+        }))
     });
+
 
     // Show form errors as toasts
     useEffect(() => {
@@ -35,83 +48,51 @@ export default function CheckoutPage() {
     }, [errors]);
 
     const handleSubmit = (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    // Client-side validation based on payment method
-    if (data.payment_gateway === 'Bkash') {
-        if (!/^[A-Z0-9]{10,}$/i.test(data.bkash_trxId || '')) {
-            toast.error("Please enter a valid 10+ character Bkash Transaction ID");
-            return;
+        // Client-side validation based on payment method
+        if (data.payment_gateway === 'Bkash') {
+            if (!/^[A-Z0-9]{10,}$/i.test(data.bkash_trxId || '')) {
+                toast.error("Please enter a valid 10+ character Bkash Transaction ID");
+                return;
+            }
+        } else if (data.payment_gateway === 'Bank') {
+            if (!data.bank_receipt_no) {
+                toast.error("Please enter your bank receipt ID");
+                return;
+            }
         }
-    } else if (data.payment_gateway === 'Bank') {
-        if (!data.bank_receipt_no) {
-            toast.error("Please enter your bank receipt ID");
-            return;
-        }
-    }
 
-    // Prepare the data to send
-    const formData = {
-        payment_gateway: data.payment_gateway,
-        customer_mobile: data.customer_mobile,
-        customer_email: data.customer_email,
-        customer_address: data.customer_address,
-        amount_paid: data.amount_paid,
-        courses: data.courses,
-        ...(data.payment_gateway === 'Stripe' && { transaction_id: data.transaction_id }),
-        // Include payment method specific fields
-        ...(data.payment_gateway === 'Bkash' && { bkash_trxId: data.bkash_trxId }),
-        ...(data.payment_gateway === 'Bank' && { bank_receipt_no: data.bank_receipt_no })
+        // Prepare the data to send
+        const formData = {
+            payment_gateway: data.payment_gateway,
+            customer_mobile: data.customer_mobile,
+            customer_email: data.customer_email,
+            customer_address: data.customer_address,
+            amount_paid: data.amount_paid,
+            courses: data.courses,
+            ...(data.payment_gateway === 'Stripe' && { transaction_id: data.transaction_id }),
+            // Include payment method specific fields
+            ...(data.payment_gateway === 'Bkash' && { bkash_trxId: data.bkash_trxId }),
+            ...(data.payment_gateway === 'Bank' && { bank_receipt_no: data.bank_receipt_no })
+        };
+
+        post(route('checkout.store'), {
+            data: formData,
+            onSuccess: () => {
+                toast.success("Order placed successfully!");
+                clearCart();
+            },
+            onError: (errors) => {
+                if (errors.bank_receipt_no) {
+                    toast.error(errors.bank_receipt_no);
+                }
+                // Handle other errors...
+            }
+        });
     };
 
-    post(route('checkout.store'), {
-        data: formData,
-        onSuccess: () => {
-            toast.success("Order placed successfully!");
-            clearCart();
-        },
-        onError: (errors) => {
-            if (errors.bank_receipt_no) {
-                toast.error(errors.bank_receipt_no);
-            }
-            // Handle other errors...
-        }
-    });
-};
 
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-
-    //     // Client-side validation based on payment method
-    //     if (data.payment_gateway === 'Bkash') {
-    //         if (!/^[A-Z0-9]{10,}$/i.test(data.bkash_trxId.toString())) {
-    //             toast.error("Please enter a valid 10+ character Bkash Transaction ID");
-    //             return;
-    //         }
-    //         if (parseFloat(data.amount_paid) < cartTotal) {
-    //             toast.error("Paid amount must be equal to or greater than the total amount");
-    //             return;
-    //         }
-    //     } else if (data.payment_gateway === 'Bank') {
-    //         if (!data.bank_receipt_no) {
-    //             toast.error("Please enter your bank receipt ID");
-    //             return;
-    //         }
-    //     } else if (data.payment_gateway === 'HandCash') {
-    //         if (!data.amount_paid || parseFloat(data.amount_paid) < cartTotal) {
-    //             toast.error("Hand cash amount must be equal to or greater than the total amount");
-    //             return;
-    //         }
-    //     }
-
-    //     post(route('checkout.store'), {
-    //         onSuccess: () => {
-    //             toast.success("Order placed successfully!");
-    //             clearCart();
-    //         },
-    //         onError: () => toast.error("Please check your form for errors")
-    //     });
-    // };
 
     return (
         <div className="container dark:text-white mx-auto py-8">
@@ -171,7 +152,7 @@ export default function CheckoutPage() {
                                 required
                             >
 
-                                 <div className="flex items-center space-x-3 border rounded-lg p-4">
+                                <div className="flex items-center space-x-3 border rounded-lg p-4">
                                     <RadioGroupItem value="Stripe" id="Stripe" />
                                     <div className="flex-1">
                                         <Label htmlFor="Stripe" className="flex items-center gap-2">
@@ -219,7 +200,7 @@ export default function CheckoutPage() {
                                 </div>
                             </RadioGroup>
 
-                             {data.payment_gateway === 'Stripe' && (
+                            {data.payment_gateway === 'Stripe' && (
                                 <div className="mt-6 space-y-4">
                                     <div>
                                         <Label>Payment Instructions</Label>

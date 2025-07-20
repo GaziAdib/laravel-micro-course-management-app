@@ -57,6 +57,11 @@ class Purchase extends Model
         return $this->belongsTo(Course::class);
     }
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);

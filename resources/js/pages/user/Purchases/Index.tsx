@@ -24,9 +24,16 @@ import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface Course {
+interface OrderItem {
     id: number;
-    title: string;
+    purchase_id: number;
+    course_data: {
+        id: number,
+        title: string,
+        price: number
+    };
+    total_price: number;
+    quantity?: number;
 }
 
 
@@ -35,7 +42,7 @@ interface Purchase {
     payment_gateway: string;
     amount_paid: number;
     status: string;
-    courses: Course[]
+    order_items: OrderItem[]
     user: {
         id: number;
         name: string;
@@ -88,18 +95,7 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
         setShowModal(true);
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this purchase item?')) {
-            router.delete(`/admin/purchases/${editStatus?.id}/delete`, {
-                onSuccess: () => {
-                    toast.success('Purchased item deleted successfully');
-                },
-                onError: (errors) => {
-                    toast.error(errors.error || 'Failed to delete purchases');
-                },
-            });
-        }
-    };
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -135,6 +131,8 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
             preserveScroll: true,
         });
     };
+
+
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -173,11 +171,13 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                     <TableCell>{purchase.user.name}</TableCell>
                                     <TableCell>{purchase.user.email}</TableCell>
                                     <TableCell>
-                                        {purchase.courses?.map((course) => (
-                                            <div key={course.id}>
-                                                {course.title},
-                                            </div>
-                                        ))}
+                                        {purchase?.order_items
+                                            ?.map((orderItem) => (
+                                                <div key={orderItem.id}>
+                                                    {orderItem.course_data.title},
+                                                    ({'$ '+orderItem.course_data.price}),
+                                                </div>
+                                            ))}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex gap-2">
@@ -188,13 +188,7 @@ export default function PurchasesPage({ purchases }: PurchasesPageProps) {
                                             >
                                                 Edit
                                             </Button>
-                                            {/* <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleDelete(purchase.id)}
-                                            >
-                                                Delete
-                                            </Button> */}
+
                                         </div>
                                     </TableCell>
                                 </TableRow>

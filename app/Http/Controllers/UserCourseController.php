@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePurchaseRequest;
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\OrderItem;
 use App\Models\Purchase;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -68,7 +69,7 @@ class UserCourseController extends Controller
     {
         // Make sure this path matches exactly with your file structure
 
-        Purchase::create([
+       $purchase = Purchase::create([
             'user_id' =>  Auth::user()->id,
             'payment_gateway' => $request->payment_gateway,
             'customer_mobile' => $request->customer_mobile,
@@ -78,10 +79,22 @@ class UserCourseController extends Controller
             'bank_receipt_no' => $request->bank_receipt_no,
             'bkash_trxId' => $request->bkash_trxId,
             'transaction_id' => $request->transaction_id,
-            'courses' => $request->courses,
+            // 'courses' => $request->courses,
             'status' => 'pending',
             'purchased_at' => now(),
         ]);
+
+        // Create order items
+        foreach ($request->order_items as $item) {
+            OrderItem::create([
+                'purchase_id' => $purchase->id,
+                'course_data' => $item['course_data'],
+                'quantity' => $item['quantity'],
+                'total_price' => $item['course_data']['price'] * $item['quantity'],
+                'coupon_code' => $item['coupon_code'] ?? null,
+                'discount_amount' => $item['discount_amount'] ?? 0
+            ]);
+        }
 
         return redirect()->route('user.courses.index')
             ->with('success', 'Course Purchases Successfully');
