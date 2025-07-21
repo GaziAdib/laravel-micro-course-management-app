@@ -6,6 +6,7 @@ use App\Models\Purchase;
 use App\Models\Review;
 use App\Policies\PurchasePolicy;
 use App\Policies\ReviewPolicy;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 
@@ -30,15 +31,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        //  // Global before hook - grants super admins all permissions
-        // Gate::before(function ($user, $ability) {
-        //     if ($user->role === 'admin') {
-        //         return true;
-        //     }
-        // });
+        Model::automaticallyEagerLoadRelationships();
 
-        // Gate::define('changeStatus', function ($user) {
-        //     return $user->role === 'admin' || $user->role === 'moderator';
-        // });
     }
 }

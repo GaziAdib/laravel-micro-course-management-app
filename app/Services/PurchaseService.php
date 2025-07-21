@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Course;
 use App\Models\Purchase;
-use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 

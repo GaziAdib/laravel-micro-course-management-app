@@ -21,6 +21,7 @@ interface Module {
     id: string
     title: string
     order: number
+    is_paid: boolean
     lessons: Lesson[]
 }
 
@@ -32,7 +33,10 @@ interface Course {
 }
 
 export default function ClassroomPage() {
-    const { course: initialCourseData } = usePage<{ course: Course }>().props
+    const { course: initialCourseData, modules, canViewFreeModule, hasPurchased } = usePage<{ course: Course }>().props
+
+    const {auth} = usePage().props
+
 
     const [activeLesson, setActiveLesson] = useState<Lesson | null>(null)
     const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
@@ -147,6 +151,7 @@ export default function ClassroomPage() {
                                 {initialCourseData.modules.map(module => (
                                     <div key={module.id} className="rounded-lg py-2 my-2 overflow-hidden border">
                                         <Button
+                                        disabled={!canViewFreeModule && auth.user.role !== 'admin' && module.is_paid && !hasPurchased}
                                             variant="ghost"
                                             onClick={() => toggleModule(module.id)}
                                             className="w-full flex items-center justify-between p-4 hover:bg-accent transition-colors"
@@ -165,6 +170,7 @@ export default function ClassroomPage() {
                                             <div className="space-y-3 pb-2 px-2">
                                                 {module.lessons.map(lesson => (
                                                     <Button
+                                                        disabled={!canViewFreeModule && auth.user.role !== 'admin' && module.is_paid && !hasPurchased}
                                                         key={lesson.id}
                                                         variant="ghost"
                                                         onClick={() => setActiveLesson(lesson)}
