@@ -24,23 +24,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('courses', CourseController::class)->except(['show']);
 });
 
 // Custom module routes for a course
-Route::get('/admin/modules', [ModuleController::class, 'index'])->name('admin.modules.index');
-Route::post('/admin/course/{course}/module/add', [ModuleController::class, 'store'])->name('admin.modules.store');
-Route::put('/admin/course/{course}/module/{module}', [ModuleController::class, 'update'])->name('admin.modules.update');
+Route::get('/admin/modules', [ModuleController::class, 'index'])->middleware(['auth', 'admin'])->name('admin.modules.index');
+Route::post('/admin/course/{course}/module/add', [ModuleController::class, 'store'])->middleware(['auth', 'admin'])->name('admin.modules.store');
+Route::put('/admin/course/{course}/module/{module}', [ModuleController::class, 'update'])->middleware(['auth', 'admin'])->name('admin.modules.update');
 Route::delete('/admin/course/{course}/module/{module}', [ModuleController::class, 'destroy'])->name('admin.modules.destroy');
 
 
 // Custom Lessons routes for a course
-Route::get('/admin/lessons', [LessonController::class, 'index'])->name('admin.lessons.index');
-Route::post('/admin/{module}/lesson/add', [LessonController::class, 'store'])->name('admin.lessons.store');
-Route::put('/admin/{module}/lesson/{lesson}', [LessonController::class, 'update'])->name('admin.lesons.update');
-Route::delete('/admin/{module}/lesson/{lesson}', [LessonController::class, 'destroy'])->name('admin.lessons.destroy');
+Route::get('/admin/lessons', [LessonController::class, 'index'])->middleware(['auth', 'admin'])->name('admin.lessons.index');
+Route::post('/admin/{module}/lesson/add', [LessonController::class, 'store'])->middleware(['auth', 'admin'])->name('admin.lessons.store');
+Route::put('/admin/{module}/lesson/{lesson}', [LessonController::class, 'update'])->middleware(['auth', 'admin'])->name('admin.lesons.update');
+Route::delete('/admin/{module}/lesson/{lesson}', [LessonController::class, 'destroy'])->middleware(['auth', 'admin'])->name('admin.lessons.destroy');
+
+
 
 
 Route::middleware(['auth'])->prefix('user')->group(function () {
@@ -62,12 +64,13 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::post('/checkouts/store', [UserCourseController::class, 'purchaseCourse'])->name('checkout.store');
 });
 
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/purchases', [PurchaseController::class, 'adminShowAllPurchases'])->name('admin.purchases.index');
-    Route::put('/purchases/{purchase}/update', [PurchaseController::class, 'changeStatus'])->name('admin.purchases.update');
-    Route::delete('/purchases/{purchase}/delete', [PurchaseController::class, 'destroyPurchase'])->name('admin.purchases.destroy');
-});
 
+// Admin & moderator only
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/purchases', [PurchaseController::class, 'adminShowAllPurchases'])->middleware(['auth', 'admin'])->name('admin.purchases.index');
+    Route::put('/purchases/{purchase}/update', [PurchaseController::class, 'changeStatus'])->middleware(['auth', 'admin'])->name('admin.purchases.update');
+    Route::delete('/purchases/{purchase}/delete', [PurchaseController::class, 'destroyPurchase'])->middleware(['auth', 'admin'])->name('admin.purchases.destroy');
+});
 
 
 
@@ -83,11 +86,6 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 
 
 // Admin Dashboard Data
-
-// Route::middleware('admin')->group(function () {
-//     Route::get('/admin/analytics', [AdminDashboardController::class, 'analytics'])
-//         ->name('admin.analytics.index');
-// });
 
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
