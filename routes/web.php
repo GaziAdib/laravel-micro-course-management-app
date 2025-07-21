@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoryController;
@@ -79,6 +80,19 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::get('/{course}/classroom', [UserCourseController::class, 'userCourseClassroom'])->name('user.course.classroom.index');
 });
 
+
+
+// Admin Dashboard Data
+
+// Route::middleware('admin')->group(function () {
+//     Route::get('/admin/analytics', [AdminDashboardController::class, 'analytics'])
+//         ->name('admin.analytics.index');
+// });
+
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics.index');
+});
 
 
 

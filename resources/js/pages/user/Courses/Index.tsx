@@ -65,9 +65,7 @@ export default function CoursesPage() {
         filters: { search?: string; sort?: string };
     }>().props;
 
-    console.log('courses', courses);
 
-    console.log('purchases', purchases);
 
     // purchases->data->user->id
 

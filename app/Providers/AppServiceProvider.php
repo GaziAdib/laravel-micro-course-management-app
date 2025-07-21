@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Course;
 use App\Models\Purchase;
 use App\Models\Review;
+use App\Policies\CoursePolicy;
 use App\Policies\PurchasePolicy;
 use App\Policies\ReviewPolicy;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +18,8 @@ class AppServiceProvider extends ServiceProvider
 
     protected $policies = [
         Purchase::class => PurchasePolicy::class,
-        Review::class => ReviewPolicy::class
+        Review::class => ReviewPolicy::class,
+        Course::class => CoursePolicy::class
     ];
 
 
@@ -32,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
     {
 
         Model::automaticallyEagerLoadRelationships();
+
 
     }
 }

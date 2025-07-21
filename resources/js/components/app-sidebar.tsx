@@ -31,9 +31,19 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     const { auth } = usePage().props
-    const user = auth.user
+    const user = auth?.user
+
+    // Get base path based on user role
+
 
     const mainNavItems: NavItem[] = user?.role === 'admin' ? [
+
+        {
+            title: 'Admin Analytics',
+            href: '/admin/analytics',
+            icon: FolderPlus,
+        },
+
         {
             title: 'Categories',
             href: '/admin/categories',
@@ -59,8 +69,10 @@ export function AppSidebar() {
             href: '/admin/purchases',
             icon: FolderPlus,
         },
+
+
     ] : user?.role === 'moderator' ? [
-         {
+        {
             title: 'Categories',
             href: '/admin/categories',
             icon: FolderPlus,
@@ -108,11 +120,11 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuItem>
                             <Link href="/dashboard" prefetch>
                                 <AppLogo />
                             </Link>
-                        </SidebarMenuButton>
+                        </SidebarMenuItem>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
@@ -128,6 +140,8 @@ export function AppSidebar() {
         </Sidebar>
     );
 }
+
+
 
 
 
