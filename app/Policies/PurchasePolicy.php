@@ -32,7 +32,6 @@ class PurchasePolicy
     }
 
 
-
     public function updateStatus(User $user): bool
     {
         return $user->role === 'admin' || $user->role === 'moderator';

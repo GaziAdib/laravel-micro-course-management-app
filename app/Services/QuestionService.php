@@ -12,19 +12,29 @@ class QuestionService
         return Question::with('quiz')->latest()->paginate($perPage);
     }
 
+    public function getQuestion(int $id, $quizId): Question
+    {
+        return Question::where('id', $id)
+            ->where('quiz_id', $quizId)
+            ->firstOrFail();
+    }
+
     public function createQuestion(int $quizId, array $data): Question
     {
-        return Question::where('quiz_id', $quizId)->create($data);
+        return Question::create(array_merge($data, [
+            'quiz_id' => $quizId
+        ]));
     }
 
     public function updateQuestion(int $id, int $quizId, array $data): bool
     {
-        $question = Question::where('id', $id)
+        $quiz = Question::where('id', $id)
             ->where('quiz_id', $quizId)
             ->firstOrFail();
 
-        return $question->update($data);
+        return $quiz->update($data);
     }
+
 
 
     public function deleteQuestion(int $quizId, int $id): bool

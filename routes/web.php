@@ -8,6 +8,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserCourseController;
@@ -101,6 +102,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::put('/{module}/update-quiz/{quiz}', [QuizController::class, 'update'])->name('admin.quiz.update');
     Route::delete('/{module}/delete-quiz/{quiz}', [QuizController::class, 'destroy'])->name('admin.quiz.delete');
 });
+
+
+// Admin Add Questions
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/questions', [QuestionController::class, 'index'])->name('admin.questions.index');
+    Route::post('/{quiz}/add-question', [QuestionController::class, 'store'])->name('admin.question.add');
+    Route::put('/{quiz}/update-question/{question}', [QuestionController::class, 'update'])->name('admin.question.update');
+    Route::delete('/{quiz}/delete-question/{question}', [QuestionController::class, 'destroy'])->name('admin.question.delete');
+});
+
+
 
 
 

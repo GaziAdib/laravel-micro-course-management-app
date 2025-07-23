@@ -74,6 +74,11 @@ export function AppSidebar() {
             href: '/admin/quizzess',
             icon: FolderPlus,
         },
+        {
+            title: 'Questions',
+            href: '/admin/questions',
+            icon: FolderPlus,
+        },
 
 
     ] : user?.role === 'moderator' ? [
