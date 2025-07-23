@@ -67,51 +67,70 @@ class UserCourseController extends Controller
 
 
 
-
         $course = Course::with([
             'category',
             'modules' => function ($query) {
                 $query->orderBy('order', 'asc')
-                    ->with(['lessons' => function ($q) {
-                        $q->orderBy('order', 'asc');
-                    }]);
+                    ->with([
+                        'lessons' => function ($q) {
+                            $q->orderBy('order', 'asc');
+                        },
+                        'quiz' => function ($q) {  // Changed to singular 'quiz'
+                            $q->with(['questions' => function ($query) {
+                                $query->orderBy('order', 'asc');
+                            }]);
+                        }
+                    ]);
             },
             'reviews.user'
-        ])
-            ->findOrFail($courseId);
+        ])->findOrFail($courseId);
 
-    //  $purchase = Purchase::with('orderItems')->where('user_id', Auth::id())->get();
 
-    //  dd($purchase);
 
-    //  $exists = Purchase::where('user_id', Auth::id())
-    //     ->whereHas('orderItems', function($query) use ($courseId) {
-    //         $query->whereJsonContains('course_data->->id', $courseId);
-    //     })
-    //     ->exists();
+        // $course = Course::with([
+        //     'category',
+        //     'modules' => function ($query) {
+        //         $query->orderBy('order', 'asc')
+        //             ->with(['lessons' => function ($q) {
+        //                 $q->orderBy('order', 'asc');
+        //             }]);
+        //     },
+        //     'reviews.user'
+        // ])
+        //     ->findOrFail($courseId);
 
-    //     dd($exists);
+        //  $purchase = Purchase::with('orderItems')->where('user_id', Auth::id())->get();
 
-      $user = $request->user();
+        //  dd($purchase);
 
-      if (!$user->can('view', $course)) {
-        abort(403, 'You do not have permission to view this course');
-    }
+        //  $exists = Purchase::where('user_id', Auth::id())
+        //     ->whereHas('orderItems', function($query) use ($courseId) {
+        //         $query->whereJsonContains('course_data->->id', $courseId);
+        //     })
+        //     ->exists();
 
-    // $canViewFreeModule = $user->can('canViewFreeModule', $user, $course, Module::class);
+        //     dd($exists);
 
-    // dd($canViewFreeModule);
+        $user = $request->user();
 
-    $hasPurchased =  Purchase::where('user_id', Auth::id())
-        ->whereHas('orderItems', function($query) use ($courseId) {
-            // For MySQL 5.7+ with JSON support
-            $query->where('course_data', 'like', '%"id":'.$courseId.'%');
-            #$query->whereJsonContains('course_data->id', $courseId);
+        if (!$user->can('view', $course)) {
+            abort(403, 'You do not have permission to view this course');
+        }
 
-            // Alternative for other databases:
-            // $query->where('course_data', 'like', '%"id":'.$courseId.'%');
-        })
-        ->exists();
+        // $canViewFreeModule = $user->can('canViewFreeModule', $user, $course, Module::class);
+
+        // dd($canViewFreeModule);
+
+        $hasPurchased =  Purchase::where('user_id', Auth::id())
+            ->whereHas('orderItems', function ($query) use ($courseId) {
+                // For MySQL 5.7+ with JSON support
+                $query->where('course_data', 'like', '%"id":' . $courseId . '%');
+                #$query->whereJsonContains('course_data->id', $courseId);
+
+                // Alternative for other databases:
+                // $query->where('course_data', 'like', '%"id":'.$courseId.'%');
+            })
+            ->exists();
 
         // dd($canAccess);
 
@@ -124,16 +143,16 @@ class UserCourseController extends Controller
         $firstModule = $course->modules->first();
 
         $canViewFreeModule = $firstModule
-        ? $user->can('canViewFreeModule', [$course, $firstModule])
-        : true; // if no modules, allow access
+            ? $user->can('canViewFreeModule', [$course, $firstModule])
+            : true; // if no modules, allow access
 
-    // Get all modules with access status
-    $modules = $course->modules->map(function ($module) use ($user, $course) {
-        return [
-            ...$module->toArray(),
-            'can_access' => $user->can('canViewFreeModule', [$course, $module])
-        ];
-    });
+        // Get all modules with access status
+        $modules = $course->modules->map(function ($module) use ($user, $course) {
+            return [
+                ...$module->toArray(),
+                'can_access' => $user->can('canViewFreeModule', [$course, $module])
+            ];
+        });
 
 
         return Inertia::render('user/Classroom/Index', [
