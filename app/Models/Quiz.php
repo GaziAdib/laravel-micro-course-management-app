@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Quiz extends Model
 {
 
-     protected $fillable = [
+    protected $fillable = [
         'module_id',
         'title',
         'description',
@@ -15,7 +15,6 @@ class Quiz extends Model
         'max_time_limit',
         'max_attempts'
     ];
-
 
 
     public function module()

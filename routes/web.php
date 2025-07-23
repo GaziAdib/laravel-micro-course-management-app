@@ -96,10 +96,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 // Admin Add Quiz
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/quizes', [QuizController::class, 'index'])->name('admin.quizzes.index');
+    Route::get('/quizzess', [QuizController::class, 'index'])->name('admin.quizzes.index');
     Route::post('/{module}/add-quiz', [QuizController::class, 'store'])->name('admin.quiz.add');
     Route::put('/{module}/update-quiz/{quiz}', [QuizController::class, 'update'])->name('admin.quiz.update');
-    Route::delete('/{module}/delete/{quiz}', [QuizController::class, 'destroy'])->name('admin.quiz.delete');
+    Route::delete('/{module}/delete-quiz/{quiz}', [QuizController::class, 'destroy'])->name('admin.quiz.delete');
 });
 
 

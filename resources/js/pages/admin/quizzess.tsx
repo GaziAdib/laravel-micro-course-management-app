@@ -27,26 +27,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 
 
-interface Course {
+
+interface Quiz {
     id: number;
     title: string;
+    description: string;
+    passing_score: number;
+    max_time_limit: number;
+    max_attempts: number;
+    module_id: number | string;
 }
 
 interface Module {
-    id: number;
-    title: string;
-    course: Course;
-    description: string;
-    course_id: number | string;
-    is_paid: boolean
-    is_published: boolean
-    lessons_count?: number;
-    order: number
+    id: number,
+    title: string
 }
 
 
 interface PaginatedData {
-    data: Module[];
+    data: Quiz[];
     current_page: number;
     last_page: number;
     per_page: number;
@@ -58,71 +57,74 @@ interface PaginatedData {
     }[];
 }
 
-interface ModulesPageProps {
-    modules: PaginatedData;
-    courses: Course[]
+interface QuizzesPageProps {
+    quizzess: PaginatedData;
+    modules: Module[]
 }
 
 
-interface ModuleFormData {
+interface QuizFormData {
     title: string;
     description: string;
-    course_id: number | string;
-    is_paid: boolean
-    is_published: boolean
-    order: number
+    passing_score: number;
+    max_time_limit: number;
+    max_attempts: number;
+    module_id: number | string;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Modules',
-        href: '/admin/courses/modules',
+        title: 'Quizzess',
+        href: '/admin/quizzess',
     },
 ];
 
-export default function ModulesPage({ modules, courses }: ModulesPageProps) {
+export default function QuizzesPage({ quizzess, modules }: QuizzesPageProps) {
     const [showModal, setShowModal] = useState(false);
-    const [editModule, setEditModule] = useState<Module | null>(null);
-    const [formData, setFormData] = useState<ModuleFormData>({
+    const [editQuiz, setEditQuiz] = useState<Quiz | null>(null);
+    const [formData, setFormData] = useState<QuizFormData>({
         title: '',
         description: '',
-        course_id: '' as string | number,
-        is_paid: false,
-        is_published: true,
-        order: 0
+        module_id: '' as string | number,
+        passing_score: 0,
+        max_time_limit: 0,
+        max_attempts: 0
     });
 
+
     const handleAdd = () => {
-        setEditModule(null);
-        setFormData({ title: '', description: '', order: 0, course_id: '', is_paid: false, is_published: true });
+        setEditQuiz(null);
+        setFormData({ title: '', description: '', passing_score: 0, module_id: '', max_time_limit: 0, max_attempts: 0 });
         setShowModal(true);
     };
 
-    const handleEdit = (module: Module) => {
-        setEditModule(module);
+    const handleEdit = (quiz: Quiz) => {
+        setEditQuiz(quiz);
+        console.log('Quiz Info', quiz)
         setFormData({
-            title: module.title,
-            order: module.order,
-            description: module.description,
-            is_paid: module.is_paid,
-            is_published: module.is_published,
-            course_id: module.course_id
+            title: quiz.title,
+            description: quiz.description,
+            module_id: quiz.module_id,
+            passing_score: quiz.passing_score,
+            max_attempts: quiz.max_attempts,
+            max_time_limit: quiz.max_time_limit
         });
         setShowModal(true);
     };
 
-    const handleCourseChange = (value: Course) => {
-        setFormData({ ...formData, course_id: value ? Number(value) : '' });
+
+    const handleModuleChange = (value: Module) => {
+        setFormData({ ...formData, module_id: value ? Number(value) : '' });
     };
 
-    const handleDelete = (id: number, courseId: number) => {
+    const handleDelete = (id: number, moduleId: number) => {
         if (confirm('Are you sure you want to delete this module?')) {
-            router.delete(`/admin/course/${courseId}/module/${id}`, {
+            router.delete(`/admin/${moduleId}/delete-quiz/${id}`, {
                 onSuccess: () => {
-                    toast.success('Module deleted successfully');
+                    toast.success('Quiz deleted successfully');
                 },
                 onError: (errors) => {
-                    toast.error(errors.error || 'Failed to delete Module');
+                    toast.error(errors.error || 'Failed to delete Quiz');
                 },
             });
         }
@@ -132,24 +134,29 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (editModule) {
-            router.put(`/admin/course/${editModule?.course_id}/module/${editModule.id}`, formData, {
+
+
+        if (editQuiz) {
+            console.log('edit', editQuiz);
+            router.put(`/admin/${editQuiz.module_id}/update-quiz/${editQuiz.id}`, formData, {
                 onSuccess: () => {
                     setShowModal(false);
-                    toast.success('Module updated successfully');
+                    toast.success('quiz updated successfully');
                 },
                 onError: (errors) => {
-                    toast.error(errors.name || 'Failed to update module');
+                    console.log('errors', errors);
+                    toast.error(errors.name || 'Failed to quiz module');
                 },
             });
         } else {
-            router.post(`/admin/course/${formData?.course_id}/module/add`, formData, {
+            router.post(`/admin/${formData.module_id}/add-quiz`, formData, {
                 onSuccess: () => {
                     setShowModal(false);
-                    toast.success('Module created successfully');
+                    toast.success('Quiz created successfully');
                 },
                 onError: (errors) => {
-                    toast.error(errors.name || 'Failed to create module');
+                    console.log('errors', errors);
+                    toast.error(errors.name || 'Failed to create quiz');
                 },
             });
         }
@@ -164,7 +171,7 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
     };
 
     const handlePageChange = (page: number) => {
-        router.get(route('admin.modules.index'), { page }, {
+        router.get(route('admin.quizzes.index'), { page }, {
             preserveState: true,
             preserveScroll: true,
         });
@@ -172,14 +179,14 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Modules" />
+            <Head title="Quizzess" />
             <Toaster richColors closeButton position="top-right" />
 
             <div className="flex flex-col gap-4 p-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold">Modules</h1>
+                    <h1 className="text-2xl font-bold">Quizzess</h1>
                     <Button onClick={handleAdd}>
-                        Add Module
+                        Add Quiz
                     </Button>
                 </div>
 
@@ -188,36 +195,37 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Title</TableHead>
-                                <TableHead>Course</TableHead>
-                                <TableHead>Order</TableHead>
-                                <TableHead>Publish Status</TableHead>
-                                <TableHead>Paid Status</TableHead>
-                                <TableHead>Lessons Count</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>Module Name</TableHead>
+                                <TableHead>Passing Score</TableHead>
+                                <TableHead>Max Attempts</TableHead>
+                                <TableHead>Max Time Limits</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {modules?.data?.map((module) => (
-                                <TableRow key={module.id}>
-                                    <TableCell>{module?.title}</TableCell>
-                                    <TableCell>{module?.course?.title}</TableCell>
-                                    <TableCell>{module?.order}</TableCell>
-                                    <TableCell>{module?.is_published ? 'Published' : 'Pending'}</TableCell>
-                                    <TableCell>{module?.is_paid ? 'Paid' : 'Free'}</TableCell>
-                                    <TableCell>{module?.lessons_count}</TableCell>
+                            {quizzess?.data?.map((quiz) => (
+                                <TableRow key={quiz.id}>
+                                    <TableCell>{quiz.title}</TableCell>
+                                    <TableCell>{quiz?.description}</TableCell>
+                                    <TableCell>{quiz?.module?.title}</TableCell>
+                                    <TableCell>{quiz?.passing_score}</TableCell>
+                                    <TableCell>{quiz?.max_attempts}</TableCell>
+                                    <TableCell>{quiz?.max_time_limit}</TableCell>
+
                                     <TableCell>
                                         <div className="flex gap-2">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => handleEdit(module)}
+                                                onClick={() => handleEdit(quiz)}
                                             >
                                                 Edit
                                             </Button>
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
-                                                onClick={() => handleDelete(module.id, Number(module?.course_id))}
+                                                onClick={() => handleDelete(quiz.id, Number(quiz?.module_id))}
                                             >
                                                 Delete
                                             </Button>
@@ -235,14 +243,14 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handlePageChange(modules.current_page - 1)}
-                            disabled={modules.current_page === 1}
+                            onClick={() => handlePageChange(quizzess?.current_page - 1)}
+                            disabled={quizzess?.current_page === 1}
                             className="h-8 px-2"
                         >
                             Previous
                         </Button>
                         <div className="flex items-center space-x-1">
-                            {modules.links.map((link, i) => {
+                            {quizzess?.links.map((link, i) => {
                                 if (link.label === '...') {
                                     return (
                                         <span key={i} className="px-2">...</span>
@@ -270,8 +278,8 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handlePageChange(modules.current_page + 1)}
-                            disabled={modules.current_page === modules.last_page}
+                            onClick={() => handlePageChange(quizzess?.current_page + 1)}
+                            disabled={quizzess?.current_page === quizzess?.last_page}
                             className="h-8 px-2"
                         >
                             Next
@@ -284,10 +292,10 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>
-                                {editModule ? 'Edit Module' : 'Add Module'}
+                                {editQuiz ? 'Edit Quiz' : 'Add Quiz'}
                             </DialogTitle>
                             <DialogDescription>
-                                {editModule ? 'Make changes to your module here.' : 'Create a new module here.'}
+                                {editQuiz ? 'Make changes to your module here.' : 'Create a new module here.'}
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="space-y-4">
@@ -313,67 +321,74 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
                                 />
                             </div>
 
+                             <div className="space-y-2">
+                                <Label htmlFor="passing_score">Passing Score</Label>
+                                <Input
+                                    id="passing_score"
+                                    type="number"
+                                    name="passing_score"
+                                    min={1}
+                                    max={100}
+                                    value={formData.passing_score}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+
+
+
+                             <div className="space-y-2">
+                                <Label htmlFor="max_attempts">Max Attempts</Label>
+                                <Input
+                                    id="max_attempts"
+                                    type="number"
+                                    name="max_attempts"
+                                    min={0}
+                                    max={100}
+                                    value={formData.max_attempts}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+
+                             <div className="space-y-2">
+                                <Label htmlFor="max_time_limit">Max Time Limits (in Sec)</Label>
+                                <Input
+                                    id="max_time_limit"
+                                    type="number"
+                                    name="max_time_limit"
+                                    min={10}
+                                    value={formData.max_time_limit}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+
+
+
                             <div className="space-y-2">
-                                <Label htmlFor="course_id">Course</Label>
+                                <Label htmlFor="module_id">Module</Label>
                                 <Select
-                                    value={formData.course_id.toString()}
-                                    onValueChange={handleCourseChange}
+                                    value={formData.module_id.toString()}
+                                    onValueChange={handleModuleChange}
                                     required
                                 >
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select course" />
+                                        <SelectValue placeholder="Select module" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {courses?.map((course) => (
+                                        {modules?.map((module) => (
                                             <SelectItem
-                                                key={course.id}
-                                                value={course.id.toString()}
+                                                key={module.id}
+                                                value={module.id.toString()}
                                             >
-                                                {course.title}
+                                                {module.title} -{module.course?.title}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             </div>
 
-
-
-                            {/* Toggle for is_paid */}
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="is_paid">Paid Module</Label>
-                                <Switch
-                                    id="is_paid"
-                                    name="is_paid"
-                                    checked={formData.is_paid}
-                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_paid: checked }))}
-                                />
-                            </div>
-
-                            {/* Toggle for is_published */}
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="is_published">Publish Module</Label>
-                                <Switch
-                                    id="is_published"
-                                    name="is_published"
-                                    checked={formData.is_published}
-                                    onCheckedChange={(checked) => setFormData(prev => ({
-                                        ...prev,
-                                        is_published: checked
-                                    }))}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="order">Display Order</Label>
-                                <Input
-                                    id="order"
-                                    name="order"
-                                    type="number"
-                                    value={formData.order}
-                                    onChange={handleInputChange}
-                                    min="0"
-                                />
-                            </div>
 
                             <DialogFooter>
                                 <Button
@@ -384,7 +399,7 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
                                     Cancel
                                 </Button>
                                 <Button type="submit">
-                                    {editModule ? 'Update' : 'Create'}
+                                    {editQuiz ? 'Update' : 'Create'}
                                 </Button>
                             </DialogFooter>
                         </form>

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Question;
-use App\Models\Quiz;
 use Illuminate\Contracts\Pagination\Paginator;
 
 class QuestionService

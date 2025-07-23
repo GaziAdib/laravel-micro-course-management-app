@@ -14,10 +14,12 @@ class QuizService
 
     public function createQuiz(int $moduleId, array $data): Quiz
     {
-        return Quiz::where('module_id', $moduleId)->create($data);
+        return Quiz::create(array_merge($data, [
+            'module_id' => $moduleId
+        ]));
     }
 
-    public function updateQuiz(int $id, int $moduleId, array $data): bool
+    public function updateQuiz(int $moduleId, int $id, array $data): bool
     {
         $quiz = Quiz::where('id', $id)
             ->where('module_id', $moduleId)

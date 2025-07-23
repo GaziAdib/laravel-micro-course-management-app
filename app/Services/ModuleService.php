@@ -22,6 +22,13 @@ class ModuleService
         return Module::With(['course:id,title'])->get(['id', 'title', 'course_id']);
     }
 
+    public function fetchAllModulesWithTitle()
+    {
+        // return Module::With(['course:id,title'])->get(['id', 'title']);
+        return Module::with(['course:id,title'])->get(['id', 'title', 'course_id']);
+
+    }
+
 
 
 

@@ -69,6 +69,11 @@ export function AppSidebar() {
             href: '/admin/purchases',
             icon: FolderPlus,
         },
+         {
+            title: 'Quizzess',
+            href: '/admin/quizzess',
+            icon: FolderPlus,
+        },
 
 
     ] : user?.role === 'moderator' ? [
@@ -97,6 +102,12 @@ export function AppSidebar() {
             href: '/admin/purchases',
             icon: FolderPlus,
         },
+        {
+            title: 'Quizzess',
+            href: ' /admin/quizzess',
+            icon: FolderPlus,
+        },
+
     ] : user?.role === 'user' ? [
         {
             title: 'Courses',
