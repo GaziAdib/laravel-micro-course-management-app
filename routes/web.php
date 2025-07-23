@@ -8,6 +8,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\QuizController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserCourseController;
 
@@ -87,10 +88,21 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 
 // Admin Dashboard Data
 
-
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics.index');
 });
+
+
+// Admin Add Quiz
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/quizes', [QuizController::class, 'index'])->name('admin.quizzes.index');
+    Route::post('/{module}/add-quiz', [QuizController::class, 'store'])->name('admin.quiz.add');
+    Route::put('/{module}/update-quiz/{quiz}', [QuizController::class, 'update'])->name('admin.quiz.update');
+    Route::delete('/{module}/delete/{quiz}', [QuizController::class, 'destroy'])->name('admin.quiz.delete');
+});
+
+
 
 
 

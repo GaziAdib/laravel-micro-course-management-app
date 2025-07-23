@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quizs', function (Blueprint $table) {
+        Schema::create('quizzes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('module_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
             $table->integer('passing_score')->default(80);
-            $table->integer('max_time_limit')->nullable();
+            $table->unsignedInteger('max_time_limit')->nullable();  // Stored in seconds
             $table->integer('max_attempts')->default(1);
-            $table->index('module_id');
+
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quizs');
+        Schema::dropIfExists('quizzes');
     }
 };

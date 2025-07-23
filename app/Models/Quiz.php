@@ -17,26 +17,21 @@ class Quiz extends Model
     ];
 
 
-    protected $casts = [
-        'options' => 'array',
-    ];
-
-
 
     public function module()
     {
         return $this->belongsTo(Module::class);
     }
 
-    public function questions()
-    {
-        return $this->hasMany(Question::class)->orderBy('order');
-    }
+    // public function questions()
+    // {
+    //     return $this->hasMany(Question::class)->orderBy('order');
+    // }
 
-    public function attempts()
-    {
-        return $this->hasMany(QuizAttempt::class);
-    }
+    // public function attempts()
+    // {
+    //     return $this->hasMany(QuizAttempt::class);
+    // }
 
     // public function getTotalPointsAttribute()
     // {

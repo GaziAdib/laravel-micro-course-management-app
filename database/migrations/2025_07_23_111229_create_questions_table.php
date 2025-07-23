@@ -20,7 +20,6 @@ return new class extends Migration
             $table->text('correct_answer'); // For short answer or true/false
             $table->integer('points')->default(1);
             $table->integer('order')->default(0);
-            $table->index('quiz_id');
             $table->timestamps();
         });
     }
