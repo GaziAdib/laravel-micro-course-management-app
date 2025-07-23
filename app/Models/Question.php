@@ -17,6 +17,8 @@ class Question extends Model
     ];
 
 
+
+
     protected $casts = [
         'options' => 'array',
         'points' => 'integer',
@@ -25,7 +27,7 @@ class Question extends Model
 
     public function quiz()
     {
-        return $this->belongsTo(Quiz::class, 'quiz_id');
+        return $this->belongsTo(Quiz::class);
     }
 
     const TYPE_MULTIPLE_CHOICE = 'multiple_choice';

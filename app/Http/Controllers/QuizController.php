@@ -20,7 +20,7 @@ class QuizController extends Controller
     }
     public function index()
     {
-        $quizes = $this->quizService->paginateQuizes(10);
+        $quizes = $this->quizService->paginateQuizzes(10);
         return Inertia::render('admin/quizzes', ['quizes' => $quizes]);
     }
 
@@ -50,12 +50,15 @@ class QuizController extends Controller
     public function update(Request $request, Module $module)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|max:500',
-            'is_paid' => 'sometimes|boolean',
-            'is_published' => 'sometimes|boolean',
-            'order' => 'required|integer',
-            'course_id' => 'required|integer|exists:courses,id',
+            'title' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+            'description' => 'nullable|string',
+            'passing_score' => 'required|integer|min:1|max:100',
+            'max_time_limit' => 'nullable|integer|min:10|max:86400', // 10s to 24h (86400s)
+            'max_attempts' => 'required|integer|min:1'
         ]);
 
 
@@ -70,7 +73,7 @@ class QuizController extends Controller
     {
 
 
-        $this->quizService->deleteQuiz($quiz->id, $module->id);
+        $this->quizService->deleteQuiz($module->id, $quiz->id);
 
         return redirect()->route('admin.modules.index')
             ->with('success', 'Module Deleted Successfully');

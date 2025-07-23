@@ -23,10 +23,10 @@ class Quiz extends Model
         return $this->belongsTo(Module::class);
     }
 
-    // public function questions()
-    // {
-    //     return $this->hasMany(Question::class)->orderBy('order');
-    // }
+    public function questions()
+    {
+        return $this->hasMany(Question::class)->orderBy('order');
+    }
 
     // public function attempts()
     // {
