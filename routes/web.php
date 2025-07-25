@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ModuleController;
@@ -91,6 +92,16 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics.index');
+});
+
+
+// admin coupon system
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/coupons', [CouponController::class, 'index'])->name('admin.coupons.index');
+    Route::post('/{course}/add-coupon', [CouponController::class, 'store'])->name('admin.coupons.add');
+    Route::put('/{course}/update-coupon/{coupon}', [CouponController::class, 'update'])->name('admin.coupons.update');
+    Route::delete('/{course}/delete-coupon/{coupon}', [CouponController::class, 'destroy'])->name('admin.coupons.delete');
 });
 
 

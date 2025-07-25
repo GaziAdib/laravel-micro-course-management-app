@@ -22,10 +22,9 @@ return new class extends Migration
             $table->unsignedInteger('usage_limit')->nullable();
             $table->unsignedInteger('used_count')->default(0);
             $table->boolean('is_active')->default(false);
-            $table->json('applicable_courses')->nullable();
             $table->timestamps();
 
-            $table->index(['is_active', 'valid_from', 'valid_until'], 'coupons_active_valid_index');
+            $table->index(['is_active', 'code', 'valid_from', 'valid_until'], 'coupons_active_valid_index');
         });
     }
 

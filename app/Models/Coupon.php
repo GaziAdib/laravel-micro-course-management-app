@@ -14,7 +14,13 @@ class Coupon extends Model
         'is_active' => 'boolean',
     ];
 
-     public function isApplicableToCourse($courseId): bool
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
+
+    public function isApplicableToCourse($courseId): bool
     {
         if (empty($this->applicable_courses)) {
             return true; // Applies to all courses
@@ -23,7 +29,7 @@ class Coupon extends Model
         return in_array($courseId, $this->applicable_courses);
     }
 
-     public function isValid(): bool
+    public function isValid(): bool
     {
         $now = now();
 
@@ -34,7 +40,7 @@ class Coupon extends Model
 
 
 
-     public function calculateDiscount($originalPrice): float
+    public function calculateDiscount($originalPrice): float
     {
         return $this->discount_type === 'percentage'
             ? $originalPrice * ($this->discount_value / 100)
