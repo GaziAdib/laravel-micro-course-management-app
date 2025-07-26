@@ -348,7 +348,7 @@ class UserCourseController extends Controller
 
 
 
-public function applyCoupon(Request $request, Course $course)
+    public function applyCoupon(Request $request, Course $course)
     {
         $validated = $request->validate(['code' => 'required|string']);
 
@@ -368,6 +368,10 @@ public function applyCoupon(Request $request, Course $course)
             // if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
             //     throw new \Exception('This coupon has reached its usage limit');
             // }
+
+            if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
+                return back()->withErrors(['code' => 'This coupon has reached its usage limit']);
+            }
 
             $couponData = [
                 'code' => $coupon->code,
@@ -390,9 +394,6 @@ public function applyCoupon(Request $request, Course $course)
             return back()->with('error', $e->getMessage());
         }
     }
-
-
-
 }
 
 
