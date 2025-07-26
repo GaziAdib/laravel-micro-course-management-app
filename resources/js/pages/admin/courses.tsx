@@ -38,6 +38,7 @@ interface Course {
     description: string;
     price: number;
     category: Category;
+    coupon_code?: string;
     tags?: string[] | null;
     is_paid: boolean;
     is_featured: boolean;
@@ -80,6 +81,7 @@ interface CourseFormData {
     is_featured: boolean;
     level: CourseLevel | '';
     category_id: number | string;
+    coupon_code: string
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -100,17 +102,27 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
         is_featured: false,
         level: '' as CourseLevel | '',
         category_id: '' as string | number | '',
+        coupon_code: ''
     });
 
     const handleAdd = () => {
         setEditCourse(null);
-        setFormData({ title: '', price: 0.00, description: '', duration: '', is_featured: false, level: '', category_id: '' });
+        setFormData({ title: '', price: 0.00, description: '', duration: '', is_featured: false, level: '', category_id: '', coupon_code: '' });
         setShowModal(true);
     };
 
     const handleEdit = (course: Course) => {
         setEditCourse(course);
-        setFormData({ title: course.title, price: course.price, description: course.description, duration: course.duration, is_featured:course.is_featured, level: course.level, category_id: course.category.id });
+        setFormData({
+            title: course.title,
+            price: course.price,
+            description: course.description,
+            duration: course.duration,
+            is_featured: course.is_featured,
+            level: course.level,
+            category_id: course.category.id,
+            coupon_code: course.coupon_code as string
+        });
         setShowModal(true);
     };
 
@@ -206,7 +218,7 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
                                 <TableRow key={course.id}>
                                     <TableCell>{course.title}</TableCell>
                                     <TableCell>{course.price}</TableCell>
-                                     <TableCell>{course.level}</TableCell>
+                                    <TableCell>{course.level}</TableCell>
                                     <TableCell>{course.category.name}</TableCell>
                                     <TableCell>{course?.reviews_count}</TableCell>
                                     <TableCell>
@@ -391,6 +403,18 @@ export default function CoursesPage({ courses, categories }: CoursesPageProps) {
                                         <SelectItem value="advanced">Advanced</SelectItem>
                                     </SelectContent>
                                 </Select>
+                            </div>
+                            <div className="space-y-3">
+                                <Label htmlFor="coupon_code">Coupon Code</Label>
+                                <Input
+                                    id="coupon_code"
+                                    name="coupon_code"
+                                    placeholder="Ex: cse101"
+                                    className="my-1"
+                                    value={formData.coupon_code}
+                                    onChange={handleInputChange}
+                                    required
+                                />
                             </div>
                             <DialogFooter>
                                 <Button

@@ -9,9 +9,7 @@ class CouponService
 {
     public function paginateCoupons(int $perPage = 10): Paginator
     {
-        return Coupon::with(['course'])
-            ->latest()
-            ->paginate($perPage);
+        return Coupon::paginate($perPage);
     }
 
     public function createCoupon(array $data): Coupon

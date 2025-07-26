@@ -10,7 +10,7 @@ use App\Policies\PurchasePolicy;
 use App\Policies\ReviewPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
-
+use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,8 +34,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
+
         Model::automaticallyEagerLoadRelationships();
 
+        Inertia::share([
+            'applied_coupon' => fn () => session('applied_coupon'),
+            'flash' => fn () => [
+                'success' => session('success'),
+                'error' => session('error')
+            ],
+        ]);
 
     }
 }

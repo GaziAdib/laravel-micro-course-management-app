@@ -80,6 +80,12 @@ export function AppSidebar() {
             icon: FolderPlus,
         },
 
+        {
+            title: 'Coupons',
+            href: '/admin/coupons',
+            icon: FolderPlus,
+        },
+
 
     ] : user?.role === 'moderator' ? [
         {

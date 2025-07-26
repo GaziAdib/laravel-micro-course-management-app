@@ -382,7 +382,7 @@ export default function QuizzesPage({ quizzess, modules }: QuizzesPageProps) {
                                                 key={module.id}
                                                 value={module.id.toString()}
                                             >
-                                                {module.title} -{module.course?.title}
+                                                {module.title} -{module?.course?.title}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

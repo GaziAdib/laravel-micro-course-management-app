@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, useRemember } from '@inertiajs/react';
 import { Clock, Layers, Users, Star, ArrowLeft, BookOpen } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
@@ -7,12 +7,29 @@ import ModuleLists from '@/components/listings/ModuleLists';
 import CourseReviewForm from '@/components/forms/CourseReviewForm';
 import ReviewListings from '@/components/listings/ReviewListings';
 import AddToCartButton from '@/components/carts/AddToCartButton';
+import ApplyCoupon from '@/components/forms/ApplyCoupon';
+import { useEffect, useState } from 'react';
 
 export default function CourseDetailPage({ course }) {
 
     const { course: data } = usePage().props;
 
+    const { applied_coupon } = usePage().props;
 
+    const isCouponAppliedForThisCourse =
+        applied_coupon && applied_coupon?.course_id === course.id;
+
+    const discountAmount = applied_coupon?.discount_type === 'percentage'
+        ? (course.price * parseFloat(applied_coupon?.discount_value)) / 100
+        : parseFloat(applied_coupon?.discount_value);
+
+    const finalPrice = (course.price - Number(discountAmount)).toFixed(2);
+
+    console.log('final price', finalPrice);
+
+
+
+    // find avg Rating for this course
     const averageRating = data?.reviews?.length > 0
         ? (data?.reviews?.reduce((sum, review) => sum + review.rating, 0) / data?.reviews?.length)
         : 0;
@@ -85,7 +102,10 @@ export default function CourseDetailPage({ course }) {
                                     }>
                                         {course.level}
                                     </Badge>
-                                    <AddToCartButton course={course} />
+
+                                    <AddToCartButton course={course} finalPrice={finalPrice} isCouponAppliedForThisCourse={isCouponAppliedForThisCourse}  />
+
+                                    <ApplyCoupon course={course} />
                                 </div>
 
                                 <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
@@ -129,6 +149,10 @@ export default function CourseDetailPage({ course }) {
 
                                 <div className="prose max-w-none mb-8 text-justify">
                                     {course.description}
+                                </div>
+
+                                <div className="prose max-w-none mb-8 text-xl text-green-400 text-justify">
+                                    $ {isCouponAppliedForThisCourse ? finalPrice : course.price}
                                 </div>
 
                                 <h2 className="text-xl font-semibold mb-4">Course Modules ({course?.modules?.length})</h2>

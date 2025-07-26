@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePurchaseRequest;
 use App\Models\Category;
+use App\Models\Coupon;
 use App\Models\Course;
-use App\Models\Module;
 use App\Models\OrderItem;
 use App\Models\Purchase;
-use App\Models\User;
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -59,6 +57,9 @@ class UserCourseController extends Controller
             'filters' => $request->only(['search', 'sort', 'category'])
         ]);
     }
+
+
+
 
 
     // user can view their classroom for purchased course
@@ -214,8 +215,6 @@ class UserCourseController extends Controller
 
 
 
-
-
     public function show($courseId)
     {
 
@@ -231,12 +230,172 @@ class UserCourseController extends Controller
         ])
             ->findOrFail($courseId);
 
+        //Get your custom coupon cookie
+
+        // $appliedCouponData = null;
+
+        // if (request()->hasCookie('applied_coupon')) {
+        //     $cookieValue = request()->cookie('applied_coupon');
+
+        //     try {
+        //         $appliedCouponData = json_decode($cookieValue, true);
+
+        //         // Validate the cookie data
+        //         if (
+        //             $appliedCouponData &&
+        //             isset($appliedCouponData['course_id'], $appliedCouponData['user_id'], $appliedCouponData['code']) &&
+        //             $appliedCouponData['course_id'] == $course->id &&
+        //             $appliedCouponData['user_id'] == Auth::id()
+        //         ) {
+
+        //             // Verify coupon is still valid
+        //             $coupon = Coupon::whereRaw('LOWER(TRIM(code)) = ?', [strtolower(trim($appliedCouponData['code']))])
+        //                 ->where('is_active', true)
+        //                 ->where('valid_until', '>=', now())
+        //                 ->first();
+
+        //             if (!$coupon) {
+        //                 $appliedCouponData = null;
+        //             }
+        //         } else {
+        //             $appliedCouponData = null;
+        //         }
+        //     } catch (\Exception $e) {
+        //         // \Log::error('Error parsing applied_coupon cookie: ' . $e->getMessage());
+        //         // $appliedCouponData = null;
+        //     }
+        // }
 
         return Inertia::render('user/Courses/Show/Show', [
             'course' => $course
+            // 'appliedCoupon' => $appliedCouponData, // This was missing!
+            // 'originalPrice' => $course->price,
+            // 'discountedPrice' => $appliedCouponData ? $this->calculateDiscountedPrice($course->price, $appliedCouponData) : null,
         ]);
     }
+
+    // private function calculateDiscountedPrice($originalPrice, $couponData)
+    // {
+    //     if ($couponData['discount_type'] === 'percentage') {
+    //         return $originalPrice - ($originalPrice * $couponData['discount_value'] / 100);
+    //     } else {
+    //         return max(0, $originalPrice - $couponData['discount_value']);
+    //     }
+    // }
+
+
+    // user apply coupon
+
+    // public function applyCoupon(Request $request, Course $course)
+    // {
+    //     $validated = $request->validate(['code' => 'required|string']);
+
+    //     dd($validated);
+
+    //     try {
+    //         // Check if a coupon is already applied in the session
+    //         if ($request->session()->has('applied_coupon')) {
+    //             $existingCoupon = json_decode($request->session()->get('applied_coupon'), true);
+
+    //             // Optional: Check if it's the same coupon being reapplied
+    //             if (strtolower(trim($existingCoupon['code'])) === strtolower(trim($validated['code']))) {
+    //                 return back()->with('info', 'This coupon is already applied');
+    //             }
+
+    //             // Or force them to remove the existing coupon first
+    //             // return back()->with('error', 'Please remove the existing coupon first');
+    //         }
+
+    //         $coupon = Coupon::whereRaw('LOWER(TRIM(code)) = ?', [strtolower(trim($validated['code']))])
+    //             ->where('is_active', true)
+    //             ->whereDate('valid_from', '<=', now())
+    //             ->whereDate('valid_until', '>=', now())
+    //             ->firstOrFail();
+
+    //         if ($course->coupon_code !== $coupon->code) {
+    //             throw new \Exception('This coupon is not valid for the selected course');
+    //         }
+
+    //         if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
+    //             throw new \Exception('This coupon has reached its usage limit');
+    //         }
+
+    //         $couponData = [
+    //             'code' => $coupon->code,
+    //             'discount_value' => $coupon->discount_value,
+    //             'discount_type' => $coupon->discount_type,
+    //             'course_id' => $course->id,
+    //             'user_id' => Auth::id(),
+    //             'applied_at' => now()->timestamp,
+    //             'expires_at' => $coupon->valid_until->timestamp
+    //         ];
+
+    //         $coupon->increment('used_count');
+
+    //         // Store in session
+    //         $request->session()->put('applied_coupon', $couponData);
+
+
+    //         return redirect()->route('user.courses.index', $course->id)->with('success', 'Coupon applied!')->with('coupon_data', $couponData);
+    //     } catch (\Exception $e) {
+    //         return back()->with('error', $e->getMessage());
+    //     }
+    // }
+
+
+
+
+
+
+
+public function applyCoupon(Request $request, Course $course)
+    {
+        $validated = $request->validate(['code' => 'required|string']);
+
+
+        try {
+
+            $coupon = Coupon::whereRaw('LOWER(TRIM(code)) = ?', [strtolower(trim($validated['code']))])
+                ->where('is_active', true)
+                ->whereDate('valid_from', '<=', now())
+                ->whereDate('valid_until', '>=', now())
+                ->firstOrFail();
+
+            if ($course->coupon_code !== $coupon->code) {
+                throw new \Exception('This coupon is not valid for the selected course');
+            }
+
+            // if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
+            //     throw new \Exception('This coupon has reached its usage limit');
+            // }
+
+            $couponData = [
+                'code' => $coupon->code,
+                'discount_value' => $coupon->discount_value,
+                'discount_type' => $coupon->discount_type,
+                'course_id' => $course->id,
+                'user_id' => Auth::id(),
+                'applied_at' => now()->timestamp,
+                'expires_at' => $coupon->valid_until->timestamp
+            ];
+
+            $coupon->increment('used_count');
+
+            // Store in session
+            $request->session()->put('applied_coupon', $couponData);
+
+
+            return redirect()->route('user.courses.show', $course->id)->with('success', 'Coupon applied!')->with('coupon_data', $couponData);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+
+
 }
+
+
 
 
 

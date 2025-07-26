@@ -13,6 +13,8 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserCourseController;
+use Illuminate\Http\Request;
+
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -65,8 +67,20 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::get('/carts', [UserCourseController::class, 'showCarts'])->name('carts.index');
     Route::get('/checkouts', [UserCourseController::class, 'showCheckouts'])->name('checkouts.index');
     Route::post('/checkouts/store', [UserCourseController::class, 'purchaseCourse'])->name('checkout.store');
+    // Route::post('/courses/{course}/apply-coupon', [UserCourseController::class, 'applyCoupon'])
+    //     ->name('user.apply.coupon');
 });
 
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::post('/user/courses/{course}/apply-coupon', [UserCourseController::class, 'applyCoupon'])
+        ->name('user.apply.coupon');
+
+    Route::get('/debug-coupon', function (Request $request) {
+        return response()->json([
+            'coupon' => $request->session()->get('applied_coupon')
+        ]);
+    });
+});
 
 // Admin & moderator only
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -99,9 +113,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/coupons', [CouponController::class, 'index'])->name('admin.coupons.index');
-    Route::post('/{course}/add-coupon', [CouponController::class, 'store'])->name('admin.coupons.add');
-    Route::put('/{course}/update-coupon/{coupon}', [CouponController::class, 'update'])->name('admin.coupons.update');
-    Route::delete('/{course}/delete-coupon/{coupon}', [CouponController::class, 'destroy'])->name('admin.coupons.delete');
+    Route::post('/add-coupon', [CouponController::class, 'store'])->name('admin.coupons.add');
+    Route::put('/update-coupon/{coupon}', [CouponController::class, 'update'])->name('admin.coupons.update');
+    Route::delete('/delete-coupon/{coupon}', [CouponController::class, 'destroy'])->name('admin.coupons.delete');
 });
 
 
@@ -122,9 +136,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::put('/{quiz}/update-question/{question}', [QuestionController::class, 'update'])->name('admin.question.update');
     Route::delete('/{quiz}/delete-question/{question}', [QuestionController::class, 'destroy'])->name('admin.question.delete');
 });
-
-
-
 
 
 

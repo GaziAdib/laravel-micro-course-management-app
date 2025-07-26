@@ -35,6 +35,7 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
+
         $validated = $request->validate([
             'title' => 'required|string|max:255|unique:courses',
             'description' => 'required|string|max:2500',
@@ -53,6 +54,7 @@ class CourseController extends Controller
             'related_images' => 'nullable|array|max:10',
             'prerequisites' => 'nullable|array|max:10',
             'video_url' => 'nullable|url|max:255',
+            'coupon_code' => 'nullable|string|max:255',
 
         ]);
 
@@ -108,6 +110,7 @@ class CourseController extends Controller
             'related_images' => 'nullable|array|max:10',
             'prerequisites' => 'nullable|array|max:10',
             'video_url' => 'nullable|url|max:255',
+            'coupon_code' => 'nullable|string|max:255',
 
         ]);
 
@@ -123,9 +126,7 @@ class CourseController extends Controller
      */
     public function destroy(int $id)
     {
-        // $course = Course::findOrFail($id);
 
-        // $course->destroy($id);
 
         $this->courseService->deleteCourse($id);
 

@@ -3,18 +3,25 @@ import { useCart } from '@/contexts/CartContext';
 import { usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 
-const AddToCartButton = ({ course, isCoursePurchased }) => {
+const AddToCartButton = ({ course, isCoursePurchased, finalPrice, isCouponAppliedForThisCourse }) => {
+
 
     const { cart, addToCart } = useCart();
+
+
+    const priceToShow = isCouponAppliedForThisCourse ? finalPrice : course.price;
 
     const isInCart = cart.some(item => item.course.id === course.id);
 
 
     const handleAddToCart = (course) => {
         try {
-            addToCart(course);
+            addToCart({
+                ...course,
+                price: priceToShow
+            });
             toast.success(`${course.title} has been added to your cart`, {
-            description: `Price: $${course.price}`,
+            description: `Price: $${priceToShow}`,
             position: 'bottom-right',
             duration: 3000,
         });

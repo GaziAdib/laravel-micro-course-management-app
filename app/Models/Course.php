@@ -19,7 +19,8 @@ class Course extends Model
         'is_paid',
         'level',
         'is_featured',
-        'category_id'
+        'category_id',
+        'coupon_code'
     ];
 
     protected $casts = [
@@ -47,8 +48,5 @@ class Course extends Model
         return $this->hasManyThrough(Lesson::class, Module::class, 'course_id', 'module_id', 'id', 'id');
     }
 
-    public function coupons()
-    {
-        return $this->hasMany(Coupon::class);
-    }
+
 }

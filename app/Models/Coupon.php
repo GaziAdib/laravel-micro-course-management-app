@@ -7,28 +7,49 @@ use Illuminate\Database\Eloquent\Model;
 class Coupon extends Model
 {
     // In app/Models/Coupon.php
+
+    protected $fillable = [
+        'code',
+        'description',
+        'discount_type',
+        'discount_value',
+        'valid_from',
+        'valid_until',
+        'usage_limit',
+        'used_count',
+        'is_active'
+    ];
+
     protected $casts = [
         'valid_from' => 'datetime',
         'valid_until' => 'datetime',
-        'applicable_courses' => 'array',
         'is_active' => 'boolean',
     ];
 
 
-    public function course()
+    public static function validate(string $code, Course $course): Coupon
     {
-        return $this->belongsTo(Course::class);
-    }
+        $coupon = self::where('code', $code)
+            ->where('is_active', true)
+            ->where('valid_from', '<=', now())
+            ->where('valid_until', '>=', now())
+            ->firstOrFail();
 
-    public function isApplicableToCourse($courseId): bool
-    {
-        if (empty($this->applicable_courses)) {
-            return true; // Applies to all courses
+        // Check usage limits
+        if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
+            throw new \Exception('This coupon has reached its usage limit');
         }
 
-        return in_array($courseId, $this->applicable_courses);
+        // Optional: Check if coupon is already applied
+        if ($course->coupon_code === $code) {
+            throw new \Exception('This coupon is already applied');
+        }
+
+        return $coupon;
     }
 
+
+    // check if the coupon code is valid or not
     public function isValid(): bool
     {
         $now = now();
@@ -39,6 +60,7 @@ class Coupon extends Model
     }
 
 
+    // calculate the dicount anount based on original price
 
     public function calculateDiscount($originalPrice): float
     {
