@@ -353,46 +353,51 @@ class UserCourseController extends Controller
         $validated = $request->validate(['code' => 'required|string']);
 
 
-        try {
-
-            $coupon = Coupon::whereRaw('LOWER(TRIM(code)) = ?', [strtolower(trim($validated['code']))])
-                ->where('is_active', true)
-                ->whereDate('valid_from', '<=', now())
-                ->whereDate('valid_until', '>=', now())
-                ->firstOrFail();
-
-            if ($course->coupon_code !== $coupon->code) {
-                throw new \Exception('This coupon is not valid for the selected course');
-            }
-
-            // if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
-            //     throw new \Exception('This coupon has reached its usage limit');
-            // }
-
-            if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
-                return back()->withErrors(['code' => 'This coupon has reached its usage limit']);
-            }
-
-            $couponData = [
-                'code' => $coupon->code,
-                'discount_value' => $coupon->discount_value,
-                'discount_type' => $coupon->discount_type,
-                'course_id' => $course->id,
-                'user_id' => Auth::id(),
-                'applied_at' => now()->timestamp,
-                'expires_at' => $coupon->valid_until->timestamp
-            ];
-
-            $coupon->increment('used_count');
-
-            // Store in session
-            $request->session()->put('applied_coupon', $couponData);
 
 
-            return redirect()->route('user.courses.show', $course->id)->with('success', 'Coupon applied!')->with('coupon_data', $couponData);
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+        $coupon = Coupon::whereRaw('LOWER(TRIM(code)) = ?', [strtolower(trim($validated['code']))])
+            ->where('is_active', true)
+            ->whereDate('valid_from', '<=', now())
+            ->whereDate('valid_until', '>=', now())
+            ->firstOrFail();
+
+        // if ($course->coupon_code !== $coupon->code) {
+        //     throw new \Exception('This coupon is not valid for the selected course');
+        // }
+
+        // if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
+        //     throw new \Exception('This coupon has reached its usage limit');
+        // }
+
+        if (!$coupon) {
+            return back()->withErrors(['code' => 'Invalid or expired coupon.']);
         }
+
+        if ($course->coupon_code !== $coupon->code) {
+            return back()->withErrors(['code' => 'This coupon code is not applicable for this course!']);
+        }
+
+        if ($coupon->usage_limit && $coupon->used_count >= $coupon->usage_limit) {
+            return back()->withErrors(['code' => 'This coupon has reached its usage limit']);
+        }
+
+        $couponData = [
+            'code' => $coupon->code,
+            'discount_value' => $coupon->discount_value,
+            'discount_type' => $coupon->discount_type,
+            'course_id' => $course->id,
+            'user_id' => Auth::id(),
+            'applied_at' => now()->timestamp,
+            'expires_at' => $coupon->valid_until->timestamp
+        ];
+
+        $coupon->increment('used_count');
+
+        // Store in session
+        $request->session()->put('applied_coupon', $couponData);
+
+
+        return redirect()->route('user.courses.show', $course->id)->with('success', 'Coupon applied!')->with('coupon_data', $couponData);
     }
 }
 
