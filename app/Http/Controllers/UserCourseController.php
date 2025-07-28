@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Course;
 use App\Models\OrderItem;
 use App\Models\Purchase;
+use App\Models\Quiz;
+use App\Models\UserQuizProgress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -168,8 +170,6 @@ class UserCourseController extends Controller
     public function show($courseId)
     {
 
-
-
         $course = Course::with([
             'category',
             'modules' => function ($query) {
@@ -194,11 +194,26 @@ class UserCourseController extends Controller
 
         $totalPurchasesCount = OrderItem::where('course_data->id', $courseId)->count();
 
+        $userQuizProgressList = UserQuizProgress::where('user_id', Auth::id())
+            ->where('course_id', $course->id)
+            ->get();
+
+        #dd($userQuizProgressList);
+
+        //$totalQuizzesAttempted = $userQuizProgressList->count();
+        $totalQuizzess = Quiz::count();
+        $totalQuizzesPassed = $userQuizProgressList->where('passed', true)->count();
+
+        $userProgressPercentage = $totalQuizzess > 0
+            ? floor(($totalQuizzesPassed / $totalQuizzess) * 100)
+            : 0;
+
 
         return Inertia::render('user/Courses/Show/Show', [
             'course' => $course,
             'purchases' => $purchases,
-            'totalPurchasesCount'  => $totalPurchasesCount
+            'totalPurchasesCount'  => $totalPurchasesCount,
+            'userProgressPercentage' => $userProgressPercentage
         ]);
     }
 }
