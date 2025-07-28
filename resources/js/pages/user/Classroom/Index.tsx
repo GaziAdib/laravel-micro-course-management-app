@@ -58,6 +58,8 @@ export default function ClassroomPage() {
     const { course: initialCourseData, canViewFreeModule, hasPurchased } = usePage<{ course: Course }>().props
     const { auth } = usePage().props
 
+
+
     const [activeLesson, setActiveLesson] = useState<Lesson | null>(null)
     const [activeQuiz, setActiveQuiz] = useState<Quiz | null>(null)
     const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
@@ -103,6 +105,7 @@ export default function ClassroomPage() {
                     <CardContent className="flex flex-col gap-4">
                         {activeQuiz ? (
                             <QuizContainer
+                                courseId={initialCourseData.id}
                                 quiz={activeQuiz}
                                 onQuizComplete={handleQuizComplete}
                                 initialAttempts={quizAttempts}
@@ -219,11 +222,10 @@ export default function ClassroomPage() {
                                                             setActiveLesson(lesson)
                                                             setActiveQuiz(null)
                                                         }}
-                                                        className={`w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left ${
-                                                            activeLesson?.id === lesson.id && !activeQuiz
+                                                        className={`w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left ${activeLesson?.id === lesson.id && !activeQuiz
                                                                 ? 'bg-accent border border-border'
                                                                 : ''
-                                                        }`}
+                                                            }`}
                                                     >
                                                         <div className="relative flex-shrink-0">
                                                             <img
@@ -254,11 +256,10 @@ export default function ClassroomPage() {
                                                         }
                                                         variant="ghost"
                                                         onClick={() => startQuiz(module.quiz!)}
-                                                        className={`w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left ${
-                                                            activeQuiz?.id === module.quiz.id
+                                                        className={`w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left ${activeQuiz?.id === module.quiz.id
                                                                 ? 'bg-accent border border-border'
                                                                 : ''
-                                                        }`}
+                                                            }`}
                                                     >
                                                         <div className="relative flex-shrink-0 w-12 h-8 flex items-center justify-center bg-purple-100 dark:bg-purple-900 rounded">
                                                             <span className="text-purple-600 dark:text-purple-300 font-bold">Q</span>

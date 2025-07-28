@@ -16,7 +16,10 @@ use App\Http\Controllers\UserCartController;
 use App\Http\Controllers\UserCheckoutController;
 use App\Http\Controllers\UserCouponController;
 use App\Http\Controllers\UserCourseController;
+use App\Http\Controllers\UserCourseProgressController;
 use App\Http\Controllers\UserPurchaseController;
+use App\Http\Controllers\UserQuizProgressController;
+use App\Models\UserCourseProgress;
 use Illuminate\Http\Request;
 
 
@@ -150,6 +153,15 @@ Route::middleware(['web', 'auth'])->group(function () {
             'coupon' => $request->session()->get('applied_coupon')
         ]);
     });
+});
+
+
+// all users can see courses index and detail of course
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::post('/course-progress/store-or-update', [UserQuizProgressController::class, 'storeOrUpdateUserCourseProgress'])
+    ->name('user.course.progress.store_or_update');
+    //Route::post('/course-progress/create', [UserQuizProgressController::class, 'storeUserCourseProgress'])->name('user.course.progress.store');
+    //Route::put('/course-progress/update/{quizProgress}', [UserQuizProgressController::class, 'updateUserCourseProgress'])->name('user.course.progress.update');
 });
 
 
