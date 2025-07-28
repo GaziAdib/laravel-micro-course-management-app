@@ -18,22 +18,6 @@ class PurchaseController extends Controller
         $this->purchaseService = $purchaseService;
     }
 
-    public function showUserPurchases(Request $request)
-    {
-
-        if (!$request->user()->can('view', Purchase::class)) {
-            abort(Response::HTTP_FORBIDDEN);
-        }
-
-        $purchases = $this->purchaseService->paginateUserPurchases(10);
-
-        return Inertia::render('user/Purchases/Index', ['purchases' => $purchases]);
-
-        // if (!$request->user()->purchases()->exists()) {
-        //     return redirect()->route('user.courses.index')
-        //         ->with('success', 'You haven\'t purchased any courses yet');
-        // }
-    }
 
     public function adminShowAllPurchases(Request $request)
     {

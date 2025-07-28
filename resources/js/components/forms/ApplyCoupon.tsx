@@ -16,10 +16,6 @@ export default function ApplyCoupon({ course }) {
 
     const { flash, applied_coupon } = usePage().props;
 
-    // useEffect(() => {
-    //     if (flash.success) alert(flash.success);
-    //     if (flash.error) alert(flash.error);
-    // }, [flash]);
 
 
     const { data, setData, post, processing, errors } = useForm({
@@ -49,7 +45,7 @@ export default function ApplyCoupon({ course }) {
 
     return (
         <div className="space-y-3">
-            <Label className="text-sm font-medium text-gray-700">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Apply Coupon Code
             </Label>
 
@@ -60,7 +56,7 @@ export default function ApplyCoupon({ course }) {
                         placeholder="SUMMER24"
                         value={data.code}
                         onChange={(e) => setData('code', e.target.value)}
-                        className={`pr-10 ${errors.code ? 'border-red-500' : ''}`}
+                        className={`pr-10 border-2 border-gray-500 my-2 ${errors.code ? 'border-red-500' : ''}`}
                         disabled={processing}
                     />
                     {data.code && !processing && (
@@ -77,7 +73,7 @@ export default function ApplyCoupon({ course }) {
                 <Button
                     onClick={applyCoupon}
                     disabled={processing || !data.code.trim()}
-                    className="min-w-[100px]"
+                    className="min-w-[80px] my-2"
                 >
                     {processing ? (
                         <Loader2 className="h-4 w-4 animate-spin" />

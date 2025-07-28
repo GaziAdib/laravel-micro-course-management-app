@@ -5,7 +5,6 @@ namespace App\Models;
 use App\CourseLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use PHPUnit\Framework\Constraint\Count;
 
 class Course extends Model
 {

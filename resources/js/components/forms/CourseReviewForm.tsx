@@ -34,7 +34,7 @@ export default function CourseReviewForm({ course }) {
     };
 
     return (
-        <Card className="w-full max-w-2xl shadow-lg">
+        <Card className="w-full max-w-2xl my-5 shadow-lg">
             <CardHeader>
                 <CardTitle className="text-xl font-semibold">Add Your Review</CardTitle>
             </CardHeader>

@@ -12,7 +12,11 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\UserCartController;
+use App\Http\Controllers\UserCheckoutController;
+use App\Http\Controllers\UserCouponController;
 use App\Http\Controllers\UserCourseController;
+use App\Http\Controllers\UserPurchaseController;
 use Illuminate\Http\Request;
 
 
@@ -49,13 +53,6 @@ Route::delete('/admin/{module}/lesson/{lesson}', [LessonController::class, 'dest
 
 
 
-
-Route::middleware(['auth'])->prefix('user')->group(function () {
-    Route::get('/courses', [UserCourseController::class, 'index'])->name('user.courses.index');
-    Route::get('/courses/{course}', [UserCourseController::class, 'show'])->name('user.courses.show');
-});
-
-
 Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::get('/courses/{course}/reviews', [ReviewController::class, 'showReviews'])->name('user.reviews.show');
     Route::post('/courses/{course}/review/add', [ReviewController::class, 'store'])->name('user.reviews.store');
@@ -63,24 +60,7 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::delete('/courses/{course}/review/{review}', [ReviewController::class, 'destroy'])->name('user.reviews.destroy');
 });
 
-Route::middleware(['auth'])->prefix('user')->group(function () {
-    Route::get('/carts', [UserCourseController::class, 'showCarts'])->name('carts.index');
-    Route::get('/checkouts', [UserCourseController::class, 'showCheckouts'])->name('checkouts.index');
-    Route::post('/checkouts/store', [UserCourseController::class, 'purchaseCourse'])->name('checkout.store');
-    // Route::post('/courses/{course}/apply-coupon', [UserCourseController::class, 'applyCoupon'])
-    //     ->name('user.apply.coupon');
-});
 
-Route::middleware(['web', 'auth'])->group(function () {
-    Route::post('/user/courses/{course}/apply-coupon', [UserCourseController::class, 'applyCoupon'])
-        ->name('user.apply.coupon');
-
-    Route::get('/debug-coupon', function (Request $request) {
-        return response()->json([
-            'coupon' => $request->session()->get('applied_coupon')
-        ]);
-    });
-});
 
 // Admin & moderator only
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -91,33 +71,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 
 
-Route::middleware(['auth'])->prefix('user')->group(function () {
-    Route::get('/purchases', [PurchaseController::class, 'showUserPurchases'])->name('user.purchases.index');
-});
-
-
-Route::middleware(['auth'])->prefix('user')->group(function () {
-    Route::get('/{course}/classroom', [UserCourseController::class, 'userCourseClassroom'])->name('user.course.classroom.index');
-});
-
-
-
 // Admin Dashboard Data
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics.index');
 });
-
-
-// admin coupon system
-
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/coupons', [CouponController::class, 'index'])->name('admin.coupons.index');
-    Route::post('/add-coupon', [CouponController::class, 'store'])->name('admin.coupons.add');
-    Route::put('/update-coupon/{coupon}', [CouponController::class, 'update'])->name('admin.coupons.update');
-    Route::delete('/delete-coupon/{coupon}', [CouponController::class, 'destroy'])->name('admin.coupons.delete');
-});
-
 
 // Admin Add Quiz
 
@@ -135,6 +93,63 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/{quiz}/add-question', [QuestionController::class, 'store'])->name('admin.question.add');
     Route::put('/{quiz}/update-question/{question}', [QuestionController::class, 'update'])->name('admin.question.update');
     Route::delete('/{quiz}/delete-question/{question}', [QuestionController::class, 'destroy'])->name('admin.question.delete');
+});
+
+
+
+
+// admin coupon system
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/coupons', [CouponController::class, 'index'])->name('admin.coupons.index');
+    Route::post('/add-coupon', [CouponController::class, 'store'])->name('admin.coupons.add');
+    Route::put('/update-coupon/{coupon}', [CouponController::class, 'update'])->name('admin.coupons.update');
+    Route::delete('/delete-coupon/{coupon}', [CouponController::class, 'destroy'])->name('admin.coupons.delete');
+});
+
+
+
+// all users can see courses index and detail of course
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('/courses', [UserCourseController::class, 'index'])->name('user.courses.index');
+    Route::get('/courses/{course}', [UserCourseController::class, 'show'])->name('user.courses.show');
+    Route::get('/{course}/classroom', [UserCourseController::class, 'userCourseClassroom'])->name('user.course.classroom.index');
+});
+
+
+
+
+// User Course Purchases and make purchases
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('/purchases', [UserPurchaseController::class, 'showUserPurchases'])->name('user.purchases.index');
+    Route::post('/checkouts/store', [UserPurchaseController::class, 'purchaseCourse'])->name('checkout.store');
+});
+
+
+
+
+// user see carts,
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('/carts', [UserCartController::class, 'showCarts'])->name('carts.index');
+});
+
+ // user manage checkouts
+Route::middleware(['auth'])->prefix('user')->group(function () {
+    Route::get('/checkouts', [UserCheckoutController::class, 'showCheckouts'])->name('checkouts.index');
+});
+
+
+
+// user apply for coupon
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::post('/user/courses/{course}/apply-coupon', [UserCouponController::class, 'applyCoupon'])
+        ->name('user.apply.coupon');
+
+    Route::get('/debug-coupon', function (Request $request) {
+        return response()->json([
+            'coupon' => $request->session()->get('applied_coupon')
+        ]);
+    });
 });
 
 
