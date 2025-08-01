@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class ModeratorMiddleware
 {
     /**
      * Handle an incoming request.
@@ -20,7 +20,7 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if ($request->user()->role !== 'admin' && $request->user()->role !== 'moderator') {
+        if ($request->user()->role !== 'moderator') {
             return redirect('/dashboard'); // Or abort(403)
         }
 

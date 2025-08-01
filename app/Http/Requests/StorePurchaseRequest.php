@@ -21,7 +21,8 @@ class StorePurchaseRequest extends FormRequest
                 Rule::in(['Stripe', 'Bkash', 'Bank', 'Manual', 'Handcash']),
             ],
             'customer_mobile' => 'required|regex:/^01[3-9]\d{8}$/',
-            'customer_email' => 'required|email:rfc,dns', // Strict email validation
+            'customer_email' => 'required|email', // Strict email validation
+            // 'customer_email' => 'required|email:rfc,dns', // Strict email validation
             // Conditionally required fields
             'transaction_id' => [
                 Rule::requiredIf(function () {

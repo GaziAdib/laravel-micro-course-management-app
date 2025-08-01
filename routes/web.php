@@ -35,7 +35,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
-
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('courses', CourseController::class)->except(['show']);
@@ -45,7 +44,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 Route::get('/admin/modules', [ModuleController::class, 'index'])->middleware(['auth', 'admin'])->name('admin.modules.index');
 Route::post('/admin/course/{course}/module/add', [ModuleController::class, 'store'])->middleware(['auth', 'admin'])->name('admin.modules.store');
 Route::put('/admin/course/{course}/module/{module}', [ModuleController::class, 'update'])->middleware(['auth', 'admin'])->name('admin.modules.update');
-Route::delete('/admin/course/{course}/module/{module}', [ModuleController::class, 'destroy'])->name('admin.modules.destroy');
+Route::delete('/admin/course/{course}/module/{module}', [ModuleController::class, 'destroy'])->middleware(['auth', 'admin'])->name('admin.modules.destroy');
 
 
 // Custom Lessons routes for a course
@@ -55,8 +54,8 @@ Route::put('/admin/{module}/lesson/{lesson}', [LessonController::class, 'update'
 Route::delete('/admin/{module}/lesson/{lesson}', [LessonController::class, 'destroy'])->middleware(['auth', 'admin'])->name('admin.lessons.destroy');
 
 
-
-Route::middleware(['auth'])->prefix('user')->group(function () {
+// any user auth auth and purchased a course can add review
+Route::middleware('auth')->prefix('user')->group(function () {
     Route::get('/courses/{course}/reviews', [ReviewController::class, 'showReviews'])->name('user.reviews.show');
     Route::post('/courses/{course}/review/add', [ReviewController::class, 'store'])->name('user.reviews.store');
     Route::put('/courses/{course}/review/{review}', [ReviewController::class, 'update'])->name('user.reviews.update');
@@ -66,21 +65,22 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 
 
 // Admin & moderator only
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/purchases', [PurchaseController::class, 'adminShowAllPurchases'])->middleware(['auth', 'admin'])->name('admin.purchases.index');
-    Route::put('/purchases/{purchase}/update', [PurchaseController::class, 'changeStatus'])->middleware(['auth', 'admin'])->name('admin.purchases.update');
-    Route::delete('/purchases/{purchase}/delete', [PurchaseController::class, 'destroyPurchase'])->middleware(['auth', 'admin'])->name('admin.purchases.destroy');
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/purchases', [PurchaseController::class, 'adminShowAllPurchases'])->name('admin.purchases.index');
+    Route::put('/purchases/{purchase}/update', [PurchaseController::class, 'changeStatus'])->name('admin.purchases.update');
+    Route::delete('/purchases/{purchase}/delete', [PurchaseController::class, 'destroyPurchase'])->name('admin.purchases.destroy');
 });
 
 
 
-// Admin Dashboard Data
+// Admin & moderator Dashboard Data
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics.index');
 });
 
-// Admin Add Quiz
+
+// Admin & modeator Add Quiz
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/quizzess', [QuizController::class, 'index'])->name('admin.quizzes.index');
@@ -90,7 +90,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 });
 
 
-// Admin Add Questions
+// Admin & moderator Add Questions
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/questions', [QuestionController::class, 'index'])->name('admin.questions.index');
     Route::post('/{quiz}/add-question', [QuestionController::class, 'store'])->name('admin.question.add');
@@ -101,7 +101,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 
 
-// admin coupon system
+// admin and moderator handle coupon system
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/coupons', [CouponController::class, 'index'])->name('admin.coupons.index');
@@ -113,7 +113,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 
 // all users can see courses index and detail of course
-Route::middleware(['auth'])->prefix('user')->group(function () {
+Route::middleware('auth')->prefix('user')->group(function () {
     Route::get('/courses', [UserCourseController::class, 'index'])->name('user.courses.index');
     Route::get('/courses/{course}', [UserCourseController::class, 'show'])->name('user.courses.show');
     Route::get('/{course}/classroom', [UserCourseController::class, 'userCourseClassroom'])->name('user.course.classroom.index');
@@ -123,21 +123,20 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 
 
 // User Course Purchases and make purchases
-Route::middleware(['auth'])->prefix('user')->group(function () {
+Route::middleware('auth')->prefix('user')->group(function () {
     Route::get('/purchases', [UserPurchaseController::class, 'showUserPurchases'])->name('user.purchases.index');
     Route::post('/checkouts/store', [UserPurchaseController::class, 'purchaseCourse'])->name('checkout.store');
 });
 
 
 
-
 // user see carts,
-Route::middleware(['auth'])->prefix('user')->group(function () {
+Route::middleware('auth')->prefix('user')->group(function () {
     Route::get('/carts', [UserCartController::class, 'showCarts'])->name('carts.index');
 });
 
  // user manage checkouts
-Route::middleware(['auth'])->prefix('user')->group(function () {
+Route::middleware('auth')->prefix('user')->group(function () {
     Route::get('/checkouts', [UserCheckoutController::class, 'showCheckouts'])->name('checkouts.index');
 });
 
@@ -157,7 +156,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
 
 // all users can see courses index and detail of course
-Route::middleware(['auth'])->prefix('user')->group(function () {
+Route::middleware('auth')->prefix('user')->group(function () {
     Route::post('/course-progress/store-or-update', [UserQuizProgressController::class, 'storeOrUpdateUserCourseProgress'])
     ->name('user.course.progress.store_or_update');
     //Route::post('/course-progress/create', [UserQuizProgressController::class, 'storeUserCourseProgress'])->name('user.course.progress.store');

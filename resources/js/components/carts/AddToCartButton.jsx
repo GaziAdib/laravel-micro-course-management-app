@@ -1,13 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
-import { usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 const AddToCartButton = ({ course, isCoursePurchased, finalPrice, isCouponAppliedForThisCourse }) => {
 
 
     const { cart, addToCart } = useCart();
-
 
     const priceToShow = isCouponAppliedForThisCourse ? finalPrice : course.price;
 

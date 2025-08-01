@@ -19,12 +19,6 @@ class ReviewController extends Controller
         $this->reviewService = $reviewService;
     }
 
-    // public function index()
-    // {
-    //     $reviews = $this->reviewService->paginateAllReviews(10);
-
-    //     return Inertia::render('admin/categories', ['reviews' => $reviews]);
-    // }
 
     public function showReviews(Request $request, $courseId)
     {
@@ -40,8 +34,6 @@ class ReviewController extends Controller
         ]);
     }
 
-
-    public function create() {}
 
 
     public function store(Request $request, Course $course)
@@ -65,11 +57,6 @@ class ReviewController extends Controller
     }
 
 
-
-    public function edit(string $id)
-    {
-        //
-    }
 
 
     public function update(Request $request, Course $course, Review $review)
@@ -96,8 +83,11 @@ class ReviewController extends Controller
 
     public function destroy(Request $request, Course $course, Review $review)
     {
+
         if (!$request->user()->can('delete', $review)) {
-            abort(Response::HTTP_FORBIDDEN);
+            return redirect()->back()
+                ->withErrors(['error' => 'Only Admin & Moderator Can Delete Any Review!'])
+                ->withInput();
         }
 
         $this->reviewService->deleteReview($review->id, $course->id);

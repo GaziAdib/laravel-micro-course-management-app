@@ -69,7 +69,7 @@ export function AppSidebar() {
             href: '/admin/purchases',
             icon: FolderPlus,
         },
-         {
+        {
             title: 'Quizzess',
             href: '/admin/quizzess',
             icon: FolderPlus,
@@ -115,7 +115,18 @@ export function AppSidebar() {
         },
         {
             title: 'Quizzess',
-            href: ' /admin/quizzess',
+            href: '/admin/quizzess',
+            icon: FolderPlus,
+        },
+        {
+            title: 'Questions',
+            href: '/admin/questions',
+            icon: FolderPlus,
+        },
+
+        {
+            title: 'Coupons',
+            href: '/admin/coupons',
             icon: FolderPlus,
         },
 

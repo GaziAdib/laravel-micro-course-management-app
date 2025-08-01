@@ -28,6 +28,15 @@ import { Textarea } from '@/components/ui/textarea';
 
 
 
+interface Module {
+    id: number
+    title: string;
+    course: {
+        title:string;
+    }
+}
+
+
 interface Quiz {
     id: number;
     title: string;
@@ -35,14 +44,9 @@ interface Quiz {
     passing_score: number;
     max_time_limit: number;
     max_attempts: number;
-    module_id: number | string;
+    module_id: number;
+    module: Module
 }
-
-interface Module {
-    id: number,
-    title: string
-}
-
 
 interface PaginatedData {
     data: Quiz[];
@@ -69,7 +73,7 @@ interface QuizFormData {
     passing_score: number;
     max_time_limit: number;
     max_attempts: number;
-    module_id: number | string;
+    module_id: number;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -85,7 +89,7 @@ export default function QuizzesPage({ quizzess, modules }: QuizzesPageProps) {
     const [formData, setFormData] = useState<QuizFormData>({
         title: '',
         description: '',
-        module_id: '' as string | number,
+        module_id: 0,
         passing_score: 0,
         max_time_limit: 0,
         max_attempts: 0
@@ -94,13 +98,12 @@ export default function QuizzesPage({ quizzess, modules }: QuizzesPageProps) {
 
     const handleAdd = () => {
         setEditQuiz(null);
-        setFormData({ title: '', description: '', passing_score: 0, module_id: '', max_time_limit: 0, max_attempts: 0 });
+        setFormData({ title: '', description: '', passing_score: 0, module_id: 0, max_time_limit: 0, max_attempts: 0 });
         setShowModal(true);
     };
 
     const handleEdit = (quiz: Quiz) => {
         setEditQuiz(quiz);
-        console.log('Quiz Info', quiz)
         setFormData({
             title: quiz.title,
             description: quiz.description,
@@ -113,8 +116,9 @@ export default function QuizzesPage({ quizzess, modules }: QuizzesPageProps) {
     };
 
 
-    const handleModuleChange = (value: Module) => {
-        setFormData({ ...formData, module_id: value ? Number(value) : '' });
+    const handleModuleChange = (value: string) => {
+        const moduleId = parseInt(value);
+        setFormData({ ...formData, module_id: moduleId  });
     };
 
     const handleDelete = (id: number, moduleId: number) => {
@@ -138,7 +142,7 @@ export default function QuizzesPage({ quizzess, modules }: QuizzesPageProps) {
 
         if (editQuiz) {
             console.log('edit', editQuiz);
-            router.put(`/admin/${editQuiz.module_id}/update-quiz/${editQuiz.id}`, formData, {
+            router.put(`/admin/${editQuiz.module_id}/update-quiz/${editQuiz.id}`, formData as Record<string, any>, {
                 onSuccess: () => {
                     setShowModal(false);
                     toast.success('quiz updated successfully');
@@ -149,14 +153,14 @@ export default function QuizzesPage({ quizzess, modules }: QuizzesPageProps) {
                 },
             });
         } else {
-            router.post(`/admin/${formData.module_id}/add-quiz`, formData, {
+            router.post(`/admin/${formData.module_id}/add-quiz`, formData as Record<string, any>, {
                 onSuccess: () => {
                     setShowModal(false);
                     toast.success('Quiz created successfully');
                 },
                 onError: (errors) => {
                     console.log('errors', errors);
-                    toast.error(errors.name || 'Failed to create quiz');
+                    toast.error(errors.error || 'Failed to create quiz');
                 },
             });
         }
@@ -225,7 +229,7 @@ export default function QuizzesPage({ quizzess, modules }: QuizzesPageProps) {
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
-                                                onClick={() => handleDelete(quiz.id, Number(quiz?.module_id))}
+                                                onClick={() => handleDelete(quiz.id, quiz?.module_id)}
                                             >
                                                 Delete
                                             </Button>

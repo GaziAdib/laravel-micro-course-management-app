@@ -23,15 +23,14 @@ export default function CheckoutPage() {
         transaction_id: undefined,
         amount_paid: cartTotal,
         order_items: cart.map(item => ({
-            course_data: {  // This must match exactly what backend expects
+            course_data: {
                 id: item.course.id,
                 title: item.course.title,
                 price: item.course.price,
-                // Include ALL fields you need in the order item
                 image_url: item.course.image_url,
                 duration: item.course.duration
             },
-            quantity: item.quantity || 1, // Ensure quantity exists, default to 1
+            quantity: item.quantity || 1,
             coupon_code: item.coupon_code || null,
             discount_amount: item.discount_amount || 0
         }))

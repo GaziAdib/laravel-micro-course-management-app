@@ -111,9 +111,11 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
         setShowModal(true);
     };
 
-    const handleCourseChange = (value: Course) => {
-        setFormData({ ...formData, course_id: value ? Number(value) : '' });
+    const handleCourseChange = (value: string) => {
+        const courseId = parseInt(value);
+        setFormData({ ...formData, course_id: courseId});
     };
+
 
     const handleDelete = (id: number, courseId: number) => {
         if (confirm('Are you sure you want to delete this module?')) {
@@ -133,7 +135,7 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
         e.preventDefault();
 
         if (editModule) {
-            router.put(`/admin/course/${editModule?.course_id}/module/${editModule.id}`, formData, {
+            router.put(`/admin/course/${editModule?.course_id}/module/${editModule.id}`, formData as Record<string, any>, {
                 onSuccess: () => {
                     setShowModal(false);
                     toast.success('Module updated successfully');
@@ -143,7 +145,7 @@ export default function ModulesPage({ modules, courses }: ModulesPageProps) {
                 },
             });
         } else {
-            router.post(`/admin/course/${formData?.course_id}/module/add`, formData, {
+            router.post(`/admin/course/${formData?.course_id}/module/add`, formData as Record<string, any>, {
                 onSuccess: () => {
                     setShowModal(false);
                     toast.success('Module created successfully');

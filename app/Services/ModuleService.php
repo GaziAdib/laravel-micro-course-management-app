@@ -9,7 +9,6 @@ class ModuleService
 {
     public function paginateModules(int $perPage = 10): Paginator
     {
-        #return Module::withCount('lessons')->latest()->paginate($perPage);
         return Module::with('course')
             ->withCount('lessons')
             ->latest()
@@ -24,12 +23,9 @@ class ModuleService
 
     public function fetchAllModulesWithTitle()
     {
-        // return Module::With(['course:id,title'])->get(['id', 'title']);
         return Module::with(['course:id,title'])->get(['id', 'title', 'course_id']);
 
     }
-
-
 
 
     public function createModule(array $data, int $courseId): Module
@@ -49,7 +45,6 @@ class ModuleService
                         ->firstOrFail()
                         ->update($data);
 
-        #return Module::findOrFail($id)->update($data);
     }
 
     public function deleteModule(int $courseId, int $id): bool

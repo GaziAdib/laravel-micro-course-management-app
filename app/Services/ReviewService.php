@@ -24,20 +24,12 @@ class ReviewService
             ->where('is_approved', true)
             ->latest()
             ->paginate($perPage);
-
-        // return Review::with('course')
-        //     ->where('course_id', $courseId)
-        //     ->latest()
-        //     ->paginate($perPage);
-
-
     }
 
 
 
     public function addReview(int $courseId, array $data): Review
     {
-        #return Review::whereCourseId($courseId)->create($data);
 
         return Review::create([
             'course_id' => $courseId,
@@ -57,22 +49,13 @@ class ReviewService
             ->whereUserId(Auth::id())
             ->firstOrFail()
             ->update($data);
-
-        #return Module::findOrFail($id)->update($data);
     }
 
 
     public function deleteReview(int $id, int $courseId): bool
     {
 
-        return Review::where(function ($query) {
-            $query->where('user_id', Auth::id());
-
-            if (Auth::user()->role === 'admin') {
-                $query->orWhereRaw('1 = 1'); // always true, allows admin
-            }
-        })
-            ->where('id', $id)
+        return Review::where('id', $id)
             ->where('course_id', $courseId)
             ->firstOrFail()
             ->delete();

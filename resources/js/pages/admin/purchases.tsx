@@ -41,6 +41,8 @@ interface Purchase {
     payment_gateway: string;
     amount_paid: number;
     status: string;
+    bkash_trxId: string;
+    bank_receipt_no: string;
     order_items: OrderItem[]
     user: {
         id: number;
@@ -64,6 +66,10 @@ interface PaginatedData {
 
 interface PurchasesPageProps {
     purchases: PaginatedData;
+    can: {
+        updateStatus: boolean;
+        delete: boolean;
+    }
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -85,7 +91,7 @@ export default function PurchasesPage({ purchases, can }: PurchasesPageProps) {
 
 
 
-    const handleStatusChange = (value) => {
+    const handleStatusChange = (value: string) => {
         setFormData({ ...formData, status: value })
     }
 
@@ -98,7 +104,7 @@ export default function PurchasesPage({ purchases, can }: PurchasesPageProps) {
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this purchase item?')) {
-            router.delete(`/admin/purchases/${editStatus?.id}/delete`, {
+            router.delete(`/admin/purchases/${id}/delete`, {
                 onSuccess: () => {
                     toast.success('Purchased item deleted successfully');
                 },

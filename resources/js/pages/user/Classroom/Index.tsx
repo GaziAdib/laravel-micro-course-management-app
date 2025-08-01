@@ -5,11 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { usePage } from '@inertiajs/react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { QuizContainer } from '../../../components/quiz/QuizContainer';
 
 interface Lesson {
-    id: string
+    id: number
     title: string
     duration: string
     video_url: string
@@ -18,11 +17,11 @@ interface Lesson {
 }
 
 interface Quiz {
-    id: string
+    id: number
     title: string
     description: string
     questions: Array<{
-        id: string
+        id: number
         question_text: string
         options: {
             choices: Array<{
@@ -39,7 +38,7 @@ interface Quiz {
 }
 
 interface Module {
-    id: string
+    id: number
     title: string
     order: number
     is_paid: boolean
@@ -48,16 +47,20 @@ interface Module {
 }
 
 interface Course {
-    id: string
+    id: number
     title: string
     description: string
     modules: Module[]
+    coupon_code?: string;
+    tags?: string[] | null;
+    is_paid: boolean;
+    is_featured: boolean;
+    image_url?: string | null;
 }
 
 export default function ClassroomPage() {
     const { course: initialCourseData, canViewFreeModule, hasPurchased } = usePage<{ course: Course }>().props
     const { auth } = usePage().props
-
 
 
     const [activeLesson, setActiveLesson] = useState<Lesson | null>(null)
@@ -196,7 +199,7 @@ export default function ClassroomPage() {
                                 {initialCourseData.modules.map(module => (
                                     <div key={module.id} className="rounded-lg py-2 my-2 overflow-hidden border">
                                         <Button
-                                            disabled={!canViewFreeModule && auth.user.role !== 'admin' && module.is_paid && !hasPurchased}
+                                            disabled={!canViewFreeModule && auth.user.role !== 'admin' && auth.user.role !== 'moderator'  && module.is_paid && !hasPurchased}
                                             variant="ghost"
                                             onClick={() => toggleModule(module.id)}
                                             className="w-full flex items-center justify-between p-4 hover:bg-accent transition-colors"
@@ -215,7 +218,7 @@ export default function ClassroomPage() {
                                             <div className="space-y-3 pb-2 px-2">
                                                 {module.lessons.map(lesson => (
                                                     <Button
-                                                        disabled={!canViewFreeModule && auth.user.role !== 'admin' && module.is_paid && !hasPurchased}
+                                                        disabled={!canViewFreeModule && auth.user.role !== 'admin' && auth.user.role !== 'moderator' && module.is_paid && !hasPurchased}
                                                         key={lesson.id}
                                                         variant="ghost"
                                                         onClick={() => {
@@ -251,7 +254,7 @@ export default function ClassroomPage() {
                                                 {module.quiz && (
                                                     <Button
                                                         disabled={
-                                                            (!canViewFreeModule && auth?.user.role !== 'admin' && module.is_paid && !hasPurchased) ||
+                                                            (!canViewFreeModule && auth?.user.role !== 'admin' && auth.user.role !== 'moderator' && module.is_paid && !hasPurchased) ||
                                                             (quizAttempts >= module.quiz.max_attempts)
                                                         }
                                                         variant="ghost"

@@ -25,9 +25,16 @@ import { toast, Toaster } from "sonner";
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+
+interface Quiz {
+    id: number;
+    title: string;
+}
+
 interface Question {
     id: number;
     quiz_id: number;
+    quiz: Quiz;
     question_text: string;
     options: {
         choices: {
@@ -39,10 +46,7 @@ interface Question {
     points: number;
 }
 
-interface Quiz {
-    id: number;
-    title: string;
-}
+
 
 interface PaginatedData {
     data: Question[];
@@ -59,7 +63,9 @@ interface PaginatedData {
 
 interface QuestionsPageProps {
     questions: PaginatedData;
-    quizzess: Quiz[];
+    quizzess: {
+        data: Quiz[]
+    }
 }
 
 interface QuestionFormData {

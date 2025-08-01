@@ -25,6 +25,8 @@ class UserPurchaseController extends Controller
     public function purchaseCourse(StorePurchaseRequest $request)
     {
 
+
+
         $purchase = Purchase::create([
             'user_id' =>  Auth::user()->id,
             'payment_gateway' => $request->payment_gateway,

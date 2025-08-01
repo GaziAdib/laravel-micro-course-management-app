@@ -44,6 +44,11 @@ class QuizController extends Controller
         ]);
 
 
+        if ($module->quiz) {
+            return redirect()->back()
+                ->withErrors(['error' => 'This module already has a quiz. You cannot add more than one.'])
+                ->withInput();
+        }
 
         $new_quiz = $this->quizService->createQuiz($module->id, $validated);
 
