@@ -16,10 +16,8 @@ use App\Http\Controllers\UserCartController;
 use App\Http\Controllers\UserCheckoutController;
 use App\Http\Controllers\UserCouponController;
 use App\Http\Controllers\UserCourseController;
-use App\Http\Controllers\UserCourseProgressController;
 use App\Http\Controllers\UserPurchaseController;
 use App\Http\Controllers\UserQuizProgressController;
-use App\Models\UserCourseProgress;
 use Illuminate\Http\Request;
 
 
