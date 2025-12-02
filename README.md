@@ -64,25 +64,30 @@ This platform bridges the gap between administrators and learners. It offers a p
 
 ### 1. Powerful Admin Analytics
 A centralized hub for platform oversight. Monitor total courses, student enrollments, and revenue trends through interactive charts.
+<img src="./images/course_listings.png" width="100%" alt="Admin Analytics Dashboard" />
+<br/>
+
+### 2. Powerful Admin Analytics
+A centralized hub for platform oversight. Monitor total courses, student enrollments, and revenue trends through interactive charts.
 <img src="./images/full_admin_analyticspng.png" width="100%" alt="Admin Analytics Dashboard" />
 <br/>
 
-### 2. Immersive Video Learning Experience
+### 3. Immersive Video Learning Experience
 The core of the student experience. A side-by-side video player with a collapsible curriculum tree (Modules > Lessons), allowing students to track progress seamlessly.
 <img src="./images/video_playback_system.jpg" width="100%" alt="Video Learning Player" />
 <br/>
 
-### 3. Course Catalog & Discovery
+### 4. Course Catalog & Discovery
 A dynamic grid layout featuring search, categorization, and advanced filtering. Includes "Featured" badges and pricing indicators.
 <img src="./images/course_listings.jpg" width="100%" alt="Course Listings" />
 <br/>
 
-### 4. Dynamic Course Details
+### 5. Dynamic Course Details
 A conversion-optimized landing page for every course. Shows curriculum preview, instructor details, pricing, and allows users to apply **Coupon Codes** before purchase.
 <img src="./images/course_detail_page.png" width="100%" alt="Course Detail Page" />
 <br/>
 
-### 5. Advanced Content Management
+### 6. Advanced Content Management
 #### Module Management
 Drag-and-drop or list-based management of course modules with paid/free status toggles.
 <img src="./images/manage_modules.png" width="100%" alt="Module Management" />
@@ -92,7 +97,7 @@ Add video URLs, descriptions, and duration for specific lessons within modules.
 <img src="./images/lessons_manage.png" width="100%" alt="Lesson Management" />
 <br/>
 
-### 6. Marketing & Sales
+### 7. Marketing & Sales
 #### Coupon System
 Create discount codes (percentage or fixed amount) with expiry dates to drive sales.
 <img src="./images/coupon_system.png" width="100%" alt="Coupon System" />
@@ -102,7 +107,7 @@ View all transactions, payment gateways used (e.g., Bkash), and verify payment s
 <img src="./images/purchase_control_Page.png" width="100%" alt="Purchase History" />
 <br/>
 
-### 7. Secure Authentication
+### 8. Secure Authentication
 A clean, secure login interface for students and admins, supporting "Remember Me" functionality.
 <img src="./images/login_page.png" width="600" alt="Login Page" />
 
